@@ -1,7 +1,5 @@
 Full TODO List:
-- Spilt up rendering entirely. Possible nexts to split into seperate files: 
-    - buffer objects (VBOs, EBOs for example)
-    - VAO
+- Spilt up rendering entirely into seperate files
 - Rewrite/reorganize the code to be cleaner
 x Split header files into source files when needed
 - Make a texture atlas and create a function that can find the texture coordinates for a texture
