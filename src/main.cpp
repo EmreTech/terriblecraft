@@ -1,4 +1,4 @@
-// graphic libraries includes
+// Graphic libraries includes
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -9,26 +9,21 @@
 #include <iostream>
 #include <vector>
 
-// local includes
+// Local includes
+#include "gl/window.hpp"
 #include "gl/shader.hpp"
 #include "gl/buffer.hpp"
 #include "gl/vao.hpp"
-#include "gl/texture.hpp"
-
-#include "world/player/camera.hpp"
-
+#include "gl/texture.hpp" // End of GL includes
+#include "world/player/camera.hpp" // End of world includes
 #include "utils/clock.hpp"
-#include "utils/types.hpp"
+#include "utils/types.hpp" // End of utils includes
 
 // Rewrite! Starting again with GLFW instead of SFML (like the original)
 // I didn't get much done with the original write anyways...
 
 // Macro to check if a key was pressed
 #define BUTTON_PRESSED(win, key) glfwGetKey(win, key) == GLFW_PRESS
-
-// Window size
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
 
 // Camera
 World::Player::Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -39,14 +34,9 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// Misc
 bool cursorCaptured = true;
 
-void resize_window_event(GLFWwindow *window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-// TODO: Move keyboard and mouse processing input functions to a seperate file
 void processInput(GLFWwindow *window)
 {  
     if (BUTTON_PRESSED(window, GLFW_KEY_ESCAPE))
@@ -54,16 +44,8 @@ void processInput(GLFWwindow *window)
 
     if (BUTTON_PRESSED(window, GLFW_KEY_P))
     {
-        if (cursorCaptured)
-        {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            cursorCaptured = false;
-        }
-        else
-        {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            cursorCaptured = true;
-        }
+        glfwSetInputMode(window, GLFW_CURSOR, cursorCaptured ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+        cursorCaptured = !cursorCaptured;
     }
 
     if (BUTTON_PRESSED(window, GLFW_KEY_W)) // Forward
@@ -101,106 +83,22 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 int main()
 {
     // Init GLFW
-    glfwInit();
+    gl::Window Window;
+    Window.init();
     Clock c;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, TRUE);
-#endif
-
-    // Open a window
-    auto window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Voxel Game", NULL, NULL);
-    if (!window)
-    {
-        std::cout << "Failed to create window with GLFW. You might not have the required OpenGL version" << '\n';
-        glfwTerminate();
-        return EXIT_FAILURE;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    // Init Glad (for OpenGL functions)
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize Glad (OpenGL)" << '\n';
-        return EXIT_FAILURE;
-    }
-
-    glfwSetFramebufferSizeCallback(window, resize_window_event);
-    glfwSetCursorPosCallback(window, mouse_callback);
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(Window.window, mouse_callback);
 
     // Setup OpenGL for rendering
     glEnable(GL_DEPTH_TEST);
     gl::Shader shade("shaders/vertex.glsl", "shaders/frag.glsl");
-
-    std::vector<float> vertices {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // Top
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // Bottom
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // Left
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // Right
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // Front
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // Back
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
-
-    std::vector<glm::vec3> cubePositions {
-        glm::vec3( 0.0f,  0.0f,  0.0f), 
-        glm::vec3( 2.0f,  5.0f, -15.0f), 
-        glm::vec3(-1.5f, -2.2f, -2.5f),  
-        glm::vec3(-3.8f, -2.0f, -12.3f),  
-        glm::vec3( 2.4f, -0.4f, -3.5f),  
-        glm::vec3(-1.7f,  3.0f, -7.5f),  
-        glm::vec3( 1.3f, -2.0f, -2.5f),  
-        glm::vec3( 1.5f,  2.0f, -2.5f), 
-        glm::vec3( 1.5f,  0.2f, -1.5f), 
-        glm::vec3(-1.3f,  1.0f, -1.5f)  
-    };
 
     gl::Buffer vbo;
     vbo.init(GL_ARRAY_BUFFER);
     gl::VAO vao;
     vao.init();
 
-    vbo.bufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices.front());
+    vbo.bufferData(GL_ARRAY_BUFFER, sizeof(float), vertices);
     vao.attribute(vbo, 0, 3, GL_FLOAT, 5 * sizeof(float), 0);
     vao.attribute(vbo, 1, 2, GL_FLOAT, 5 * sizeof(float), 3 * sizeof(float));
 
@@ -215,17 +113,17 @@ int main()
     (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
 
     // Game loop!
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(Window.window))
     {
         // Calculate the delta time
         float currentFrame = c.elapsed();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        glfwSetWindowTitle(window, ("Voxel Game - Delta: " + std::to_string(deltaTime)).c_str());
+        Window.setTitle("Voxel Game - Delta: " + std::to_string(deltaTime));
 
         // Process any input
-        processInput(window);
+        processInput(Window.window);
 
         // Render
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -254,13 +152,13 @@ int main()
         }
 
         // GLFW: Swap buffers and poll events
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(Window.window);
         glfwPollEvents();
     }
 
     vao.destroy();
     vbo.destroy();
 
-    glfwTerminate();
+    Window.quit();
     return EXIT_SUCCESS;
 }

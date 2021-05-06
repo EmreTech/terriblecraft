@@ -3,6 +3,7 @@
 
 #include <glad/glad.h>
 
+#include <vector>
 #include "../utils/types.hpp"
 
 namespace gl
@@ -29,6 +30,13 @@ struct Buffer
     {
         bind(type);
         glBufferData(type, size, data, dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    }
+
+    template <typename T>
+    void bufferData(GLenum type, size_t size, std::vector<T> data, bool dynamic = false)
+    {
+        bind(type);
+        glBufferData(type, size * data.size(), &data.front(), dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     void destroy()
