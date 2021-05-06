@@ -9,6 +9,7 @@ namespace World::Block
 
 enum BlockType
 {
+    NONE,
     AIR,
     GRASS,
     DIRT,
@@ -21,7 +22,7 @@ struct Block
     glm::vec3 Position;
     
     // Block type (will be set for children of this class)
-    BlockType type;
+    BlockType type = NONE;
 
     // The parent chunk the block is contained in
     // Chunk *ParentChunk;

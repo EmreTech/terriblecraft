@@ -11,14 +11,20 @@
 
 // local includes
 #include "gl/shader.hpp"
+#include "gl/buffer.hpp"
+#include "gl/vao.hpp"
 #include "gl/texture.hpp"
+
 #include "world/player/camera.hpp"
-#include "clock.hpp"
+
+#include "utils/clock.hpp"
+#include "utils/types.hpp"
 
 // Rewrite! Starting again with GLFW instead of SFML (like the original)
+// I didn't get much done with the original write anyways...
 
+// Macro to check if a key was pressed
 #define BUTTON_PRESSED(win, key) glfwGetKey(win, key) == GLFW_PRESS
-#define TRUE 1 + 1 - 1 * 1 / 1 // Complicated way of saying 1, or true
 
 // Window size
 const int WINDOW_WIDTH = 800;
@@ -189,21 +195,14 @@ int main()
         glm::vec3(-1.3f,  1.0f, -1.5f)  
     };
 
-    unsigned int VBO, VAO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    gl::Buffer vbo;
+    vbo.init(GL_ARRAY_BUFFER);
+    gl::VAO vao;
+    vao.init();
 
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices.front(), GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    vbo.bufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices.front());
+    vao.attribute(vbo, 0, 3, GL_FLOAT, 5 * sizeof(float), 0);
+    vao.attribute(vbo, 1, 2, GL_FLOAT, 5 * sizeof(float), 3 * sizeof(float));
 
     gl::Texture tex1("res/container.jpg", GL_RGB);
     gl::Texture tex2("res/awesomeface.png", GL_RGBA, true);
@@ -244,7 +243,7 @@ int main()
         shade.uniformMatrix4("view", view);
         shade.uniformMatrix4("projection", projection);
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(vao.ID);
         for (unsigned int i = 0; i < cubePositions.size(); i++)
         {
             glm::mat4 model = glm::mat4(1.0f);
@@ -258,6 +257,9 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    vao.destroy();
+    vbo.destroy();
 
     glfwTerminate();
     return EXIT_SUCCESS;
