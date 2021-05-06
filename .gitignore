@@ -1,0 +1,4 @@
+*.xcf
+res/blocks.png
+build/**
+test
