@@ -14,10 +14,6 @@ SRC_PATH := src
 LIBS := glfw3
 # General compiler flags
 COMPILE_FLAGS := -std=c++17 -Wall -Wextra -g
-# Additional release-specific flags
-RCOMPILE_FLAGS := -D NDEBUG
-# Additional debug-specific flags
-DCOMPILE_FLAGS := -D DEBUG
 # Add additional include paths
 INCLUDES := -I src -I src/libs/glad/include -I src/libs/glm/include -I src/libs/stb_image
 # General linker settings
@@ -26,14 +22,6 @@ ifeq ($(UNAME_S),Darwin)
 else
 	LINK_FLAGS = 
 endif
-# Additional release-specific linker settings
-RLINK_FLAGS =
-# Additional debug-specific linker settings
-DLINK_FLAGS =
-# Destination directory, like a jail or mounted system
-DESTDIR = /
-# Install path (bin/ is appended automatically)
-INSTALL_PREFIX = usr/local
 #### END PROJECT SETTINGS ####
 
 # Optionally you may move the section above to a separate config.mk file, and
@@ -42,20 +30,9 @@ INSTALL_PREFIX = usr/local
 
 # Generally should not need to edit below this line
 
-# Function used to check variables. Use on the command line:
-# make print-VARNAME
-# Useful for debugging and adding features
-print-%: ; @echo $*=$($*)
-
 # Shell used in this makefile
 # bash is used for 'echo -en'
 SHELL = /bin/bash
-# Clear built-in rules
-.SUFFIXES:
-# Programs for installation
-INSTALL = install
-INSTALL_PROGRAM = $(INSTALL)
-INSTALL_DATA = $(INSTALL) -m 644
 
 # Append pkg-config specific libraries if need be
 ifneq ($(LIBS),)
@@ -71,17 +48,12 @@ ifeq ($(V),true)
 endif
 
 # Combine compiler and linker flags
-release: export CXXFLAGS := $(CXXFLAGS) $(COMPILE_FLAGS) $(RCOMPILE_FLAGS)
-release: export LDFLAGS := $(LDFLAGS) $(LINK_FLAGS) $(RLINK_FLAGS)
-debug: export CXXFLAGS := $(CXXFLAGS) $(COMPILE_FLAGS) $(DCOMPILE_FLAGS)
-debug: export LDFLAGS := $(LDFLAGS) $(LINK_FLAGS) $(DLINK_FLAGS)
+release: export CXXFLAGS := $(CXXFLAGS) $(COMPILE_FLAGS)
+release: export LDFLAGS := $(LDFLAGS) $(LINK_FLAGS)
 
 # Build and output paths
 release: export BUILD_PATH := build
-release: export BIN_PATH := build/release
-debug: export BUILD_PATH := build
-debug: export BIN_PATH := build/debug
-install: export BIN_PATH := build
+release: export BIN_PATH := build/bin
 
 # Find all source files in the source directory, sorted by most
 # recently modified
@@ -156,34 +128,12 @@ else
 endif
 	@$(MAKE) all --no-print-directory
 
-# Debug build for gdb debugging
-.PHONY: debug
-debug: dirs
-ifeq ($(USE_VERSION), true)
-	@echo "Beginning debug build v$(VERSION_STRING)"
-else
-	@echo "Beginning debug build"
-endif
-	@$(MAKE) all --no-print-directory
-
 # Create the directories used in the build
 .PHONY: dirs
 dirs:
 	@echo "Creating directories"
 	@mkdir -p $(dir $(OBJECTS))
 	@mkdir -p $(BIN_PATH)
-
-# Installs to the set path
-.PHONY: install
-install:
-	@echo "Installing to $(DESTDIR)$(INSTALL_PREFIX)/bin"
-	@$(INSTALL_PROGRAM) $(BIN_PATH)/$(BIN_NAME) $(DESTDIR)$(INSTALL_PREFIX)/bin
-
-# Uninstalls the program
-.PHONY: uninstall
-uninstall:
-	@echo "Removing $(DESTDIR)$(INSTALL_PREFIX)/bin/$(BIN_NAME)"
-	@$(RM) $(DESTDIR)$(INSTALL_PREFIX)/bin/$(BIN_NAME)
 
 # Removes all build files
 .PHONY: clean

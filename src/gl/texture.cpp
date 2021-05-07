@@ -3,7 +3,7 @@
 namespace gl
 {
 
-void Texture::init(const std::string &filepath, GLint typeOfImage, bool flipImage)
+void Texture::init(const std::string &filepath, GLint typeOfImage, int stbi_load_as)
 {
         // Generate the texture's ID
         glGenTextures(1, &ID);
@@ -12,18 +12,15 @@ void Texture::init(const std::string &filepath, GLint typeOfImage, bool flipImag
         // Generic settings for the textures
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // Load and generate the texture
         int nrChannels;
 
-        if (flipImage)
-            stbi_set_flip_vertically_on_load(true);
-        else
-            stbi_set_flip_vertically_on_load(false);
+        stbi_set_flip_vertically_on_load(true);
 
-        unsigned char *data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
+        unsigned char *data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, stbi_load_as);
 
         if (data)
         {

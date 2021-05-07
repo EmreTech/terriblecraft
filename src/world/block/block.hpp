@@ -2,6 +2,7 @@
 #define BLOCK_HPP
 
 #include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 #include <vector>
 
 namespace World::Block
@@ -24,13 +25,17 @@ struct Block
     // Block type (will be set for children of this class)
     BlockType type = NONE;
 
-    // The parent chunk the block is contained in
-    // Chunk *ParentChunk;
+    // The position vertices for the block
+    std::vector<float> position_vertices;
 
-    // The position vertices and texture coordinates for the block
-    std::vector<float> vertices;
+    // The texture coordinates for the block
+    std::vector<glm::vec2> texture_coords;
 
-    Block(glm::vec3 pos/*, Chunk *parent_chunk*/) : Position{pos}/*, ParentChunk{parent_chunk}*/ {}
+    // Combined positional vertices and texture coordinates
+    std::vector<float> full_vertices;
+
+    Block(){}
+    Block(glm::vec3 pos) : Position{pos}{}
 };
 
 } // namespace World::Block

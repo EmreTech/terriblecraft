@@ -15,7 +15,8 @@
 #include "gl/buffer.hpp"
 #include "gl/vao.hpp"
 #include "gl/texture.hpp" // End of GL includes
-#include "world/player/camera.hpp" // End of world includes
+#include "world/player/camera.hpp" 
+#include "world/block/blockatlas.hpp" // End of world includes
 #include "utils/clock.hpp"
 #include "utils/types.hpp" // End of utils includes
 
@@ -36,6 +37,30 @@ float lastFrame = 0.0f;
 
 // Misc
 bool cursorCaptured = true;
+
+struct FPSCounter
+{
+    float fps = 0;
+
+    FPSCounter(){}
+
+    void update()
+    {
+        frameCount++;
+
+        if (delayTimer.elapsed() > 0.5)
+        {
+            fps = frameCount / fpsTimer.restart();
+            frameCount = 0;
+            delayTimer.restart();
+        }
+    }
+
+    private:
+    int frameCount = 0;
+    Clock delayTimer;
+    Clock fpsTimer; 
+};
 
 void processInput(GLFWwindow *window)
 {  
@@ -80,6 +105,37 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     cam.Mouse(xoffset, yoffset);
 }
 
+std::vector<float> test()
+{
+    std::vector<float> output;
+    auto textureCoords = World::Block::GetTextureCoords(0, 0);
+
+    int x = 0;
+    int y = 0;
+
+    for (size_t i{0}; i < vertices.size(); i++)
+    {
+        output.push_back(vertices.at(i));
+        y++;
+        
+        if (y == 3)
+        {
+            float tex_first  = textureCoords.at(x).x;
+            float tex_second = textureCoords.at(x).y;
+
+            //std::cout << "Recieved first texture: " << tex_first << " Recieved second texture: " << tex_second << '\n';
+            
+            output.push_back(tex_first);
+            output.push_back(tex_second);
+
+            (x != textureCoords.size() - 1 ? x++ : x = 0);
+            y = 0;
+        }
+    }
+
+    return output;
+}
+
 int main()
 {
     // Init GLFW
@@ -98,20 +154,17 @@ int main()
     gl::VAO vao;
     vao.init();
 
-    vbo.bufferData(GL_ARRAY_BUFFER, sizeof(float), vertices);
+    auto newVertices = test(); // Testing out the texture atlas
+    vbo.bufferData(GL_ARRAY_BUFFER, sizeof(float), newVertices);
     vao.attribute(vbo, 0, 3, GL_FLOAT, 5 * sizeof(float), 0);
     vao.attribute(vbo, 1, 2, GL_FLOAT, 5 * sizeof(float), 3 * sizeof(float));
 
-    gl::Texture tex1("res/container.jpg", GL_RGB);
-    gl::Texture tex2("res/awesomeface.png", GL_RGBA, true);
-
-    shade.activate();
-    shade.uniformInt("texture1", 0);
-    shade.uniformInt("texture2", 1);
+    gl::Texture tex1("res/blocks.png", GL_RGBA, STBI_rgb_alpha);
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f),
     (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
 
+    FPSCounter fpsCount;
     // Game loop!
     while (!glfwWindowShouldClose(Window.window))
     {
@@ -120,19 +173,17 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        Window.setTitle("Voxel Game - Delta: " + std::to_string(deltaTime));
-
         // Process any input
         processInput(Window.window);
+
+        fpsCount.update();
+        Window.setTitle("Voxel Game - FPS: " + std::to_string(fpsCount.fps));
 
         // Render
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex1.ID);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, tex2.ID);
 
         shade.activate();
 

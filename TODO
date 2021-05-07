@@ -2,11 +2,9 @@ Full TODO List:
 - Spilt up rendering entirely into seperate files
 - Rewrite/reorganize the code to be cleaner
 x Split header files into source files when needed
-- Actually make textures for the blocks I'm going to put in
-- Make a texture atlas and create a function that can find the texture coordinates for a texture
+x Make a texture atlas and create a function that can find the texture coordinates for a texture
 x Make a block class that represents a single block with a few properties, including a pointer to the parent chunk that owns the block
-- Make block types that are parents of the block class
-- Make a chunk class that stores blocks in a 16 * 16 * 256 area (just like Minecraft)
+- Make a chunk class that stores blocks in a 16 * 16 * 16 area (just like Minecraft)
 - Optimize chunks to not render invisible block faces
 - Lighting
 - Biomes
@@ -18,3 +16,4 @@ x Make a block class that represents a single block with a few properties, inclu
 Current bugs:
 x Controlling the camera with the mouse is slightly broken
 - Textures might be rotated on the side faces
+- Texture atlas system doesn't produce the right result

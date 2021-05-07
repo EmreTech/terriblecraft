@@ -17,12 +17,12 @@ struct Texture
 
     Texture() {}
 
-    Texture(const std::string &filepath, GLint typeOfImage, bool flipImage = false)
+    Texture(const std::string &filepath, GLint typeOfImage, int stbi_load_as = STBI_rgb)
     {
-        init(filepath, typeOfImage, flipImage);
+        init(filepath, typeOfImage, stbi_load_as);
     }
 
-    void init(const std::string &filepath, GLint typeOfImage, bool flipImage);
+    void init(const std::string &filepath, GLint typeOfImage, int stbi_load_as);
 };
 
 } // namespace gl
