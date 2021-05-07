@@ -27,7 +27,7 @@
 #define BUTTON_PRESSED(win, key) glfwGetKey(win, key) == GLFW_PRESS
 
 // Camera
-World::Player::Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
+World::Player::Camera cam(glm::vec3(0.0f, 0.0f, 10.0f));
 float lastX = WINDOW_WIDTH / 2.0f, lastY = WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
 
@@ -108,10 +108,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 std::vector<float> test()
 {
     std::vector<float> output;
-    auto textureCoords = World::Block::GetTextureCoords(0, 0);
+    std::array<glm::vec2, 6> textureCoords;
 
-    int x = 0;
-    int y = 0;
+    int x, y = 0;
 
     for (size_t i{0}; i < vertices.size(); i++)
     {
@@ -120,10 +119,21 @@ std::vector<float> test()
         
         if (y == 3)
         {
+            if (faces[i / 3] == 4) // If the face is a bottom face
+            {
+                textureCoords = World::Block::GetTextureCoords(2, 0, faces[(i / 3)]);
+            }
+            else if (faces[i / 3] == 5) // If the face is a top face
+            {
+                textureCoords = World::Block::GetTextureCoords(0, 0, faces[(i / 3)]);
+            }
+            else // Otherwise, we assume side faces
+            {
+                textureCoords = World::Block::GetTextureCoords(1, 0, faces[(i / 3)]);
+            }
+
             float tex_first  = textureCoords.at(x).x;
             float tex_second = textureCoords.at(x).y;
-
-            //std::cout << "Recieved first texture: " << tex_first << " Recieved second texture: " << tex_second << '\n';
             
             output.push_back(tex_first);
             output.push_back(tex_second);
@@ -164,6 +174,23 @@ int main()
     glm::mat4 projection = glm::perspective(glm::radians(45.0f),
     (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
 
+    // Generating a "chunk layer"
+    size_t last_pos_size = 4 * 5, i = 0;
+    float x = 1;
+    while (i != last_pos_size)
+    {
+        glm::vec3 insert = glm::vec3(cubePositions.at(i).x, cubePositions.at(i).y, cubePositions.at(i).z + x);
+        cubePositions.push_back(insert);
+
+        if (cubePositions.at(i).x == 3.0f)
+        {
+            x += 0.5f;
+            x -= 0.5f;
+        }
+
+        i++;
+    }
+
     FPSCounter fpsCount;
     // Game loop!
     while (!glfwWindowShouldClose(Window.window))
@@ -176,6 +203,7 @@ int main()
         // Process any input
         processInput(Window.window);
 
+        // Update the FPS count (not related to delta time calculation at all)
         fpsCount.update();
         Window.setTitle("Voxel Game - FPS: " + std::to_string(fpsCount.fps));
 
@@ -207,6 +235,7 @@ int main()
         glfwPollEvents();
     }
 
+    // Cleanup GL resources
     vao.destroy();
     vbo.destroy();
 
