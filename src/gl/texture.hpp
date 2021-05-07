@@ -23,6 +23,7 @@ struct Texture
     }
 
     void init(const std::string &filepath, GLint typeOfImage, int stbi_load_as);
+    void bind();
 };
 
 } // namespace gl

@@ -21,19 +21,20 @@ std::array<glm::vec2, 6> GetTextureCoords(int column, int row, int face)
 
     std::array<glm::vec2, 6> output;
 
-    // This is done since the side parts of the cube have the texture fliped
-    // TODO: Possibly fix up the vertices to prevent this issue
-    if (face == 2 || face == 3)
-        output = {
-            glm::vec2(rightX, topY),    // 1, 1
-            glm::vec2(leftX,  topY),    // 0, 1
-            glm::vec2(leftX,  bottomY), // 0, 0
-            glm::vec2(leftX,  bottomY), // 0, 0
-            glm::vec2(rightX, bottomY), // 1, 0
-            glm::vec2(rightX, topY)     // 1, 1
+   switch (face)
+   {
+       case 0: // Back
+       output = {
+            glm::vec2(leftX,  bottomY),  // 0, 0
+            glm::vec2(rightX, topY),     // 1, 1
+            glm::vec2(rightX, bottomY),  // 1, 0
+            glm::vec2(rightX, topY),     // 1, 1
+            glm::vec2(leftX,  bottomY),  // 0, 0
+            glm::vec2(leftX,  topY)      // 0, 1
         };
-    
-    else
+        break;
+
+        case 1: // Front
         output = {
             glm::vec2(leftX,  bottomY),  // 0, 0
             glm::vec2(rightX, bottomY),  // 1, 0
@@ -42,7 +43,52 @@ std::array<glm::vec2, 6> GetTextureCoords(int column, int row, int face)
             glm::vec2(leftX,  topY),     // 0, 1
             glm::vec2(leftX,  bottomY)   // 0, 0
         };
-    
+        break;
+
+        case 2: // Left
+        output = {
+            glm::vec2(rightX, topY),    // 1, 1
+            glm::vec2(leftX,  topY),    // 0, 1
+            glm::vec2(leftX,  bottomY), // 0, 0
+            glm::vec2(leftX,  bottomY), // 0, 0
+            glm::vec2(rightX, bottomY), // 1, 0
+            glm::vec2(rightX, topY)     // 1, 1
+        };
+        break;
+
+        case 3: // Right
+        output = {
+            glm::vec2(rightX, topY),    // 1, 1
+            glm::vec2(leftX,  bottomY), // 0, 0
+            glm::vec2(leftX,  topY),    // 0, 1
+            glm::vec2(leftX,  bottomY), // 0, 0
+            glm::vec2(rightX, topY),    // 1, 1
+            glm::vec2(rightX, bottomY)  // 1, 0
+        };
+        break;
+
+        case 4: // Bottom
+        output = {
+            glm::vec2(leftX, topY), // 0, 1
+            glm::vec2(rightX, topY), // 1, 1
+            glm::vec2(rightX, bottomY), // 1, 0
+            glm::vec2(rightX, bottomY), // 1, 0
+            glm::vec2(leftX, bottomY), // 0, 0
+            glm::vec2(leftX, topY) // 0, 1
+        };
+        break;
+
+        case 5: // Front
+        output = {
+            glm::vec2(leftX, topY), // 0, 1
+            glm::vec2(rightX, bottomY), // 1, 0
+            glm::vec2(rightX, topY), // 1, 1
+            glm::vec2(rightX, bottomY), // 1, 0
+            glm::vec2(leftX, topY), // 0, 1
+            glm::vec2(leftX, bottomY) // 0, 0
+        };
+        break;
+   }
 
     return output;
 }

@@ -16,7 +16,8 @@
 #include "gl/vao.hpp"
 #include "gl/texture.hpp" // End of GL includes
 #include "world/player/camera.hpp" 
-#include "world/block/blockatlas.hpp" // End of world includes
+#include "world/block/blockatlas.hpp"
+#include "world/block/block.hpp" // End of world includes
 #include "utils/clock.hpp"
 #include "utils/types.hpp" // End of utils includes
 
@@ -27,7 +28,7 @@
 #define BUTTON_PRESSED(win, key) glfwGetKey(win, key) == GLFW_PRESS
 
 // Camera
-World::Player::Camera cam(glm::vec3(0.0f, 0.0f, 10.0f));
+World::Player::Camera cam(glm::vec3(0.0f, 3.0f, 10.0f));
 float lastX = WINDOW_WIDTH / 2.0f, lastY = WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
 
@@ -36,7 +37,8 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // Misc
-bool cursorCaptured = true;
+bool cursorCaptured = true, wireframe = false;
+Clock lastWireframeToggle, lastCursorCaptureToggle;
 
 struct FPSCounter
 {
@@ -67,22 +69,30 @@ void processInput(GLFWwindow *window)
     if (BUTTON_PRESSED(window, GLFW_KEY_ESCAPE))
         glfwSetWindowShouldClose(window, true);
 
-    if (BUTTON_PRESSED(window, GLFW_KEY_P))
+    if (BUTTON_PRESSED(window, GLFW_KEY_P) && lastCursorCaptureToggle.elapsed() > 2.0f)
     {
         glfwSetInputMode(window, GLFW_CURSOR, cursorCaptured ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         cursorCaptured = !cursorCaptured;
+        lastCursorCaptureToggle.restart();
     }
 
-    if (BUTTON_PRESSED(window, GLFW_KEY_W)) // Forward
+    if (BUTTON_PRESSED(window, GLFW_KEY_V) && lastWireframeToggle.elapsed() > 1.0f)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_FILL : GL_LINE);
+        wireframe = !wireframe;
+        lastWireframeToggle.restart();
+    }
+
+    if (BUTTON_PRESSED(window, GLFW_KEY_W) && cursorCaptured) // Forward
         cam.Keyboard(0, deltaTime);
      
-    if (BUTTON_PRESSED(window, GLFW_KEY_S)) // Backward
+    if (BUTTON_PRESSED(window, GLFW_KEY_S) && cursorCaptured) // Backward
         cam.Keyboard(1, deltaTime);
      
-    if (BUTTON_PRESSED(window, GLFW_KEY_A)) // Left
+    if (BUTTON_PRESSED(window, GLFW_KEY_A) && cursorCaptured) // Left
         cam.Keyboard(2, deltaTime);
      
-    if (BUTTON_PRESSED(window, GLFW_KEY_D)) // Right
+    if (BUTTON_PRESSED(window, GLFW_KEY_D) && cursorCaptured) // Right
         cam.Keyboard(3, deltaTime);
     
 }
@@ -117,26 +127,17 @@ std::vector<float> test()
         output.push_back(vertices.at(i));
         y++;
         
-        if (y == 3)
+        if (y == 3) // Slight workaround to ensure the texture coordinates are being inserted properly
         {
             if (faces[i / 3] == 4) // If the face is a bottom face
-            {
                 textureCoords = World::Block::GetTextureCoords(2, 0, faces[(i / 3)]);
-            }
             else if (faces[i / 3] == 5) // If the face is a top face
-            {
                 textureCoords = World::Block::GetTextureCoords(0, 0, faces[(i / 3)]);
-            }
-            else // Otherwise, we assume side faces
-            {
+            else // Otherwise, we assume other faces
                 textureCoords = World::Block::GetTextureCoords(1, 0, faces[(i / 3)]);
-            }
-
-            float tex_first  = textureCoords.at(x).x;
-            float tex_second = textureCoords.at(x).y;
             
-            output.push_back(tex_first);
-            output.push_back(tex_second);
+            output.push_back(textureCoords.at(x).x);
+            output.push_back(textureCoords.at(x).y);
 
             (x != textureCoords.size() - 1 ? x++ : x = 0);
             y = 0;
@@ -157,6 +158,9 @@ int main()
 
     // Setup OpenGL for rendering
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK_RIGHT);
+
     gl::Shader shade("shaders/vertex.glsl", "shaders/frag.glsl");
 
     gl::Buffer vbo;
@@ -171,23 +175,25 @@ int main()
 
     gl::Texture tex1("res/blocks.png", GL_RGBA, STBI_rgb_alpha);
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-    (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
 
     // Generating a "chunk layer"
-    size_t last_pos_size = 4 * 5, i = 0;
-    float x = 1;
+
+    size_t last_pos_size = 16 * 16, i = 0, y = 0;
+    float x = 1.0f;
+    std::vector<glm::vec3> finalPositions;
+
     while (i != last_pos_size)
     {
-        glm::vec3 insert = glm::vec3(cubePositions.at(i).x, cubePositions.at(i).y, cubePositions.at(i).z + x);
-        cubePositions.push_back(insert);
+        if (y > cubePositions.size() - 1)
+            y = 0;
 
-        if (cubePositions.at(i).x == 3.0f)
-        {
-            x += 0.5f;
-            x -= 0.5f;
-        }
+        finalPositions.push_back(glm::vec3(cubePositions.at(y).x, cubePositions.at(y).y, cubePositions.at(y).z + x));
 
+        if (cubePositions.at(y).x == MAX_X_CUBE_POSITION)
+            x += 1.0f;
+
+        y++;
         i++;
     }
 
@@ -208,23 +214,25 @@ int main()
         Window.setTitle("Voxel Game - FPS: " + std::to_string(fpsCount.fps));
 
         // Render
+
+        // Clear the color and depth buffer every new render frame
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindTexture(GL_TEXTURE_2D, tex1.ID);
+        // Bind textures (the texture atlas)
+        tex1.bind();
 
+        // Activate the shader and set some uniform variables
         shade.activate();
-
-        glm::mat4 view = cam.ViewMatrix();
-
-        shade.uniformMatrix4("view", view);
+        shade.uniformMatrix4("view", cam.ViewMatrix());
         shade.uniformMatrix4("projection", projection);
 
+        // Transform the cubes and actually render them
         glBindVertexArray(vao.ID);
-        for (unsigned int i = 0; i < cubePositions.size(); i++)
+        for (unsigned int i = 0; i < finalPositions.size(); i++)
         {
             glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
+            model = glm::translate(model, finalPositions.at(i));
             shade.uniformMatrix4("model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);

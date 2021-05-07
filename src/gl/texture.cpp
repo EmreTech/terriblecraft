@@ -34,4 +34,9 @@ void Texture::init(const std::string &filepath, GLint typeOfImage, int stbi_load
         stbi_image_free(data);
 }
 
+void Texture::bind()
+{
+    glBindTexture(GL_TEXTURE_2D, ID);
+}
+
 } // namespace gl

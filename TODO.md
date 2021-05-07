@@ -2,7 +2,7 @@
 - [] Spilt up rendering entirely into seperate files
 - [] Rewrite/reorganize the code to be cleaner
 - [x] Split header files into source files when needed
-- Come up with a title no one has came up with before (possible ideas: EmreTechCraft, TechCraft)
+- [] Come up with a title no one has came up with before (possible ideas: EmreTechCraft, TechCraft)
 
 # Textures
 - [x] Make a texture atlas and create a function that can find the texture coordinates for a texture
