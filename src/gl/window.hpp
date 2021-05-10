@@ -37,7 +37,11 @@ struct Window
         }
 
         glfwMakeContextCurrent(window);
-        initGL();
+        if (!initGL())
+        {
+            quit();
+            return;
+        }
 
         glfwSetFramebufferSizeCallback(window, resize_window_event);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -65,13 +69,15 @@ struct Window
     #endif
     }
 
-    void initGL()
+    bool initGL()
     {
         if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
         {
             std::cout << "Failed to initialize Glad (OpenGL)" << '\n';
-            return;
+            return false;
         }
+
+        return true;
     }
 };
 

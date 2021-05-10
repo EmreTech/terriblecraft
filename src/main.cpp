@@ -16,8 +16,7 @@
 #include "gl/vao.hpp"
 #include "gl/texture.hpp" // End of GL includes
 #include "world/player/camera.hpp" 
-#include "world/block/blockatlas.hpp"
-#include "world/block/block.hpp" // End of world includes
+#include "world/block/blockatlas.hpp" // End of world includes
 #include "utils/clock.hpp"
 #include "utils/types.hpp" // End of utils includes
 
@@ -147,6 +146,29 @@ std::vector<float> test()
     return output;
 }
 
+std::vector<glm::vec3> generateChunkLayer()
+{
+    size_t last_pos_size = 16 * 16, i = 0, y = 0;
+    float x = 1.0f;
+    std::vector<glm::vec3> output;
+
+    while (i != last_pos_size)
+    {
+        if (y > cubePositions.size() - 1)
+            y = 0;
+
+        output.push_back(glm::vec3(cubePositions.at(y).x, cubePositions.at(y).y, cubePositions.at(y).z + x));
+
+        if (cubePositions.at(y).x == MAX_X_CUBE_POSITION)
+            x += 1.0f;
+
+        y++;
+        i++;
+    }
+
+    return output;
+}
+
 int main()
 {
     // Init GLFW
@@ -178,24 +200,7 @@ int main()
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
 
     // Generating a "chunk layer"
-
-    size_t last_pos_size = 16 * 16, i = 0, y = 0;
-    float x = 1.0f;
-    std::vector<glm::vec3> finalPositions;
-
-    while (i != last_pos_size)
-    {
-        if (y > cubePositions.size() - 1)
-            y = 0;
-
-        finalPositions.push_back(glm::vec3(cubePositions.at(y).x, cubePositions.at(y).y, cubePositions.at(y).z + x));
-
-        if (cubePositions.at(y).x == MAX_X_CUBE_POSITION)
-            x += 1.0f;
-
-        y++;
-        i++;
-    }
+    auto finalPositions = generateChunkLayer();
 
     FPSCounter fpsCount;
     // Game loop!

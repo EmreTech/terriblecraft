@@ -5,37 +5,30 @@
 #include <glm/vec2.hpp>
 #include <vector>
 
+#include "blockid.hpp"
+
 namespace World::Block
 {
 
-enum BlockType
-{
-    NONE,
-    AIR,
-    GRASS,
-    DIRT,
-    STONE,
-};
-
+/**
+ * @brief Stores all data for a single block. This includes the position,
+ * block type, mesh vertices (including texture coordinates), and its id.
+ * 
+ * Managed by the block manager.
+ */
 struct Block
 {
     // Block's current position in the world
     glm::vec3 Position;
     
-    // Block type (will be set for children of this class)
-    BlockType type = NONE;
+    // Block type
+    BlockType type;
 
-    // The position vertices for the block
-    std::vector<float> position_vertices;
+    // The block's id. Assigned by the block manager.
+    uint8_t id;
 
-    // The texture coordinates for the block
-    std::vector<glm::vec2> texture_coords;
-
-    // Combined positional vertices and texture coordinates
-    std::vector<float> full_vertices;
-
-    Block(){}
-    Block(glm::vec3 pos) : Position{pos}{}
+    // A bool to check if the block is empty. Used by the block manager when it can't find a block with the same id.
+    bool isEmpty = false;
 };
 
 } // namespace World::Block
