@@ -4,29 +4,26 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include <string>
 #include <iostream>
+#include <string>
 
-namespace gl
-{
+namespace gl {
 
-struct Texture
-{
-    unsigned int ID;
-    int width, height;
+struct Texture {
+  unsigned int ID;
+  int width, height;
 
-    Texture() {}
+  Texture() {}
 
-    Texture(const std::string &filepath, GLint typeOfImage, int stbi_load_as = STBI_rgb)
-    {
-        init(filepath, typeOfImage, stbi_load_as);
-    }
+  Texture(const std::string &filepath, GLint typeOfImage,
+          int stbi_load_as = STBI_rgb) {
+    init(filepath, typeOfImage, stbi_load_as);
+  }
 
-    void init(const std::string &filepath, GLint typeOfImage, int stbi_load_as);
-    void bind();
+  void init(const std::string &filepath, GLint typeOfImage, int stbi_load_as);
+  void bind();
 };
 
 } // namespace gl
-
 
 #endif

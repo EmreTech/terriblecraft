@@ -3,20 +3,19 @@
 
 #include <cstdint>
 
-namespace World::Block
-{
+namespace World::Block {
 
 typedef uint8_t block_t;
 
-enum BlockType : block_t
-{
-    AIR,
-    GRASS,
-    DIRT,
-    STONE,
+enum class BlockType : block_t {
+  AIR,
+  GRASS,
+  DIRT,
+  STONE,
+
+  SIZE_TYPES
 };
 
 } // namespace World::Block
-
 
 #endif

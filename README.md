@@ -1,4 +1,4 @@
-# Voxel Game (title in progress)
+# TerribleCraft
 
 My very first Voxel game (Minecraft clone) made entirely in C++!
 

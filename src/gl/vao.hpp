@@ -5,40 +5,31 @@
 
 #include "buffer.hpp"
 
-namespace gl
-{
+namespace gl {
 
-struct VAO
-{
-    unsigned int ID;
+struct VAO {
+  unsigned int ID;
 
-    VAO(){}
+  VAO() {}
 
-    void init()
-    {
-        glGenVertexArrays(1, &ID);
-        bind();
-    }
+  void init() {
+    glGenVertexArrays(1, &ID);
+    bind();
+  }
 
-    void bind()
-    {
-        glBindVertexArray(ID);
-    }
+  void bind() const { glBindVertexArray(ID); }
 
-    void attribute(Buffer vbo, GLuint index, GLint size, GLenum type, GLsizei stride, size_t offset)
-    {
-        bind();
-        vbo.bind(GL_ARRAY_BUFFER);
+  void attribute(Buffer vbo, GLuint index, GLint size, GLenum type,
+                 GLsizei stride, size_t offset) {
+    bind();
+    vbo.bind(GL_ARRAY_BUFFER);
 
-        // Since all attribute data passed in will be a floating-point number, no need to use glVertexAttribIPointer.
-        glVertexAttribPointer(index, size, type, FALSE, stride, (void*) offset);
-        glEnableVertexAttribArray(index);
-    }
+    // Since all attribute data passed in will be a floating-point number, no
+    // need to use glVertexAttribIPointer.
+    glVertexAttribPointer(index, size, type, FALSE, stride, (void *)offset);
+  }
 
-    void destroy()
-    {
-        glDeleteVertexArrays(1, &ID);
-    }
+  void destroy() { glDeleteVertexArrays(1, &ID); }
 };
 
 } // namespace gl
