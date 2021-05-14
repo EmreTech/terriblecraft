@@ -13,66 +13,53 @@ namespace World::Chunk
 
 namespace
 {
+    const std::vector<GLfloat> frontFace
+    {
+        0, 0, 1,
+        1, 0, 1,
+        1, 1, 1,
+        0, 1, 1,
+    };
 
-std::vector<float> backFace
-{
-    0.0f, 0.0f, 0.0f, // Bottom-left
-    1.0f, 1.0f, 0.0f,   // top-right
-    1.0f, 0.0f, 0.0f,  // bottom-right
-    1.0f, 1.0f, 0.0f,   // top-right
-    0.0f, 0.0f, 0.0f, // bottom-left
-    0.0f, 1.0f, 0.0f,  // top-left
-};
+    const std::vector<GLfloat> backFace
+    {
+        1, 0, 0,
+        0, 0, 0,
+        0, 1, 0,
+        1, 1, 0,
+    };
 
-std::vector<float> frontFace
-{
-    0.0f, 0.0f, 1.0f, // bottom-left
-    1.0f, 0.0f, 1.0f,  // bottom-right
-    1.0f, 1.0f, 1.0f,   // top-right
-    1.0f, 1.0f, 1.0f,   // top-right
-    0.0f, 1.0f, 1.0f,  // top-left
-    0.0f, 0.0f, 1.0f, // bottom-left
-};
+    const std::vector<GLfloat> leftFace
+    {
+        0, 0, 0,
+        0, 0, 1,
+        0, 1, 1,
+        0, 1, 0,
+    };
 
-std::vector<float> leftFace
-{
-    0.0f, 1.0f, 1.0f,   // top-right
-    0.0f, 1.0f, 0.0f,  // top-left
-    0.0f, 0.0f, 0.0f, // bottom-left
-    0.0f, 0.0f, 0.0f, // bottom-left
-    0.0f, 0.0f, 1.0f,  // bottom-right
-    0.0f, 1.0f, 1.0f,   // top-right
-};
+    const std::vector<GLfloat> rightFace
+    {
+        1, 0, 1,
+        1, 0, 0,
+        1, 1, 0,
+        1, 1, 1,
+    };
 
-std::vector<float> rightFace
-{
-    1.0f, 1.0f, 1.0f,    // top-left
-    1.0f, 0.0f, 0.0f,  // bottom-right
-    1.0f, 1.0f, 0.0f,   // top-right
-    1.0f, 0.0f, 0.0f,  // bottom-right
-    1.0f, 1.0f, 1.0f,    // top-left
-    1.0f, 0.0f, 1.0f,   // bottom-left
-};
+    const std::vector<GLfloat> topFace
+    {
+        0, 1, 1,
+        1, 1, 1,
+        1, 1, 0,
+        0, 1, 0,
+    };
 
-std::vector<float> bottomFace
-{
-    0.0f, 0.0f, 0.0f, // top-right
-    1.0f, 0.0f, 0.0f,  // top-left
-    1.0f, 0.0f, 1.0f,   // bottom-left
-    1.0f, 0.0f, 1.0f,   // bottom-left
-    0.0f, 0.0f, 1.0f,  // bottom-right
-    0.0f, 0.0f, 0.0f, // top-right
-};
-
-std::vector<float> topFace
-{
-    0.0f, 1.0f, 0.0f, // top-left
-    1.0f, 1.0f, 1.0f,   // bottom-right
-    1.0f, 1.0f, 0.0f,  // top-right
-    1.0f, 1.0f, 1.0f,   // bottom-right
-    0.0f, 1.0f, 0.0f, // top-left
-    0.0f, 1.0f, 1.0f,  // bottom-left
-};
+    const std::vector<GLfloat> bottomFace
+    {
+        0, 0, 0,
+        1, 0, 0,
+        1, 0, 1,
+        0, 0, 1
+    };  
 
 } // namespace
 
@@ -102,15 +89,20 @@ int faces = 0;
 
 void ChunkMeshBuilder::buildMesh(ChunkMesh& mesh)
 {
+    // BUG: Top and bottom faces are not generating
+
     pMesh = &mesh;
     AdjacentBlockPositions directions;
 
-    std::cout << "Start chunk mesh build" << '\n';
+    //std::cout << "Start chunk mesh build" << '\n';
 
-    for (float x = 0.0f; x < CHUNK_SIZE; x++)
-    for (float z = 0.0f; z < CHUNK_SIZE; z++)
+    for (float i = 0; i < CHUNK_AREA; i++)
     {
-        glm::vec3 position(x, 0, z);
+        float x = (int) i % CHUNK_SIZE;
+        float y = 0.0f;
+        float z = ((int) i / CHUNK_SIZE) % CHUNK_SIZE;
+
+        glm::vec3 position(x, y, z);
         Block::Block b = pLayer->getBlock(x, z);
 
         if (b == Block::BlockType::AIR)
@@ -118,41 +110,19 @@ void ChunkMeshBuilder::buildMesh(ChunkMesh& mesh)
 
         pBlockData = &b.getData().getData();
         auto& data = *pBlockData;
-
-        float tmpXone = x + 1;
-        float tmpZone = z + 1;
-        float tmpXtwo = x - 1;
-        float tmpZtwo = z - 1;
-
-        if ( !((tmpXone >= CHUNK_SIZE || tmpZone >= CHUNK_SIZE) || (tmpXtwo < 0 || tmpZtwo < 0)) )
-            directions.update(x, 0, z);
+        directions.update(x, y, z);
 
         addFace(bottomFace, data.textureBottom, position, directions.down);
-        addFace(topFace, data.textureTop, position, directions.up);
+        addFace(topFace,    data.textureTop,    position, directions.up);
 
-        addFace(leftFace, data.textureSide, position, directions.left);
-        addFace(rightFace, data.textureSide, position, directions.right);
+        addFace(leftFace,   data.textureSide,   position, directions.left);
+        addFace(rightFace,  data.textureSide,   position, directions.right);
 
-        addFace(frontFace, data.textureSide, position, directions.front);
-        addFace(backFace, data.textureSide, position, directions.back);
+        addFace(frontFace,  data.textureSide,   position, directions.front);
+        addFace(backFace,   data.textureSide,   position, directions.back);
     }
 
-    std::cout << "Finish chunk mesh build!" << '\n';
-}
-
-// TODO: Move this to utils somewhere
-std::vector<float> vecTwoToFloat(std::array<glm::vec2, 6> vec)
-{
-    std::vector<float> output;
-    for (size_t i{0}; i < vec.size(); i++)
-    {
-        auto cx = vec.at(i).x;
-        auto cy = vec.at(i).y;
-
-        output.push_back(cx);
-        output.push_back(cy);
-    }
-    return output;
+    //std::cout << "Finish chunk mesh build!" << '\n';
 }
 
 void ChunkMeshBuilder::addFace(const std::vector<float>& blockFace,
@@ -162,8 +132,9 @@ void ChunkMeshBuilder::addFace(const std::vector<float>& blockFace,
 {
     if (makeFace(blockFacing))
     {
-        auto texCoords = vecTwoToFloat(World::Block::GetTextureCoords(textureCoords.x, textureCoords.y, faces % 6)); 
         faces++;
+        auto texCoords = World::Block::GetTextureCoords(textureCoords.x, textureCoords.y);
+
         pMesh->addFace(blockFace, texCoords, pLayer->getPosition(), blockPos);
     }
 }
@@ -171,12 +142,15 @@ void ChunkMeshBuilder::addFace(const std::vector<float>& blockFace,
 bool ChunkMeshBuilder::makeFace(const glm::vec3& blockPos)
 {
     auto block = pLayer->getBlock(blockPos.x, blockPos.z);
-
+    auto& data = block.getData().getData();
+    
     if (block == Block::BlockType::AIR)
         return true;
 
-    else
-        return false;
+    else if ((!data.isOpaque) && (data.id != pBlockData->id))
+        return true;
+
+    return false;
 }
 
 } // namespace World::Chunk

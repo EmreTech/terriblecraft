@@ -6,9 +6,10 @@
 #include "gl/buffer.hpp"
 #include "gl/vao.hpp"
 
-struct Model : public NonCopyable
+struct Model
 {
     gl::VAO vao;
+    int numOfIndices = 0;
 
     Model() = default;
     Model(const Mesh& mesh);
@@ -20,6 +21,8 @@ struct Model : public NonCopyable
     void addVBO(int dimensions, const std::vector<float>& data);
 
     private:
+    void addEBO(const std::vector<unsigned int>& indices);
+
     int vboCount = 0;
     std::vector<gl::Buffer> buffers;
 };

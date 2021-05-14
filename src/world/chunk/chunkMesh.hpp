@@ -18,10 +18,12 @@ struct ChunkMesh
     void buffer();
 
     const Model& getModel() const;
+    void deleteData();
 
     private:
     Mesh mesh;
     Model model;
+    unsigned int indicesIndex = 0;
 };
 
 } // namespace World::Chunk

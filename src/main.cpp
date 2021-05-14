@@ -27,7 +27,7 @@
 #define BUTTON_PRESSED(win, key) glfwGetKey(win, key) == GLFW_PRESS
 
 // Camera
-World::Player::Camera cam(glm::vec3(0.0f, 3.0f, 10.0f));
+World::Player::Camera cam(glm::vec3(0.0f, 3.0f, -10.0f));
 float lastX = WINDOW_WIDTH / 2.0f, lastY = WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
 
@@ -109,28 +109,6 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   cam.Mouse(xoffset, yoffset);
 }
 
-std::vector<glm::vec3> generateChunkLayer() {
-  size_t last_pos_size = 16 * 16, i = 0, y = 0;
-  float x = 1.0f;
-  std::vector<glm::vec3> output;
-
-  while (i != last_pos_size) {
-    if (y > cubePositions.size() - 1)
-      y = 0;
-
-    output.push_back(glm::vec3(cubePositions.at(y).x, cubePositions.at(y).y,
-                               cubePositions.at(y).z + x));
-
-    if (cubePositions.at(y).x == MAX_X_CUBE_POSITION)
-      x += 1.0f;
-
-    y++;
-    i++;
-  }
-
-  return output;
-}
-
 int main() {
   // Init GLFW
   gl::Window Window;
@@ -140,34 +118,51 @@ int main() {
   glfwSetCursorPosCallback(Window.window, mouse_callback);
 
   // Setup OpenGL for rendering
-  //glEnable(GL_CULL_FACE);
-  //glCullFace(GL_BACK);
-
   Renderer::CubeRenderer test;
   Renderer::ChunkRenderer chunkTest;
 
-  // Generating a "chunk layer"
-  //auto finalPositions = generateChunkLayer();
-
-  //for (const auto& i : finalPositions)
-  //  test.add(i);
-  test.add({3, 1, 0});
+  test.add({-3, 0, 0});
 
   std::cout << "Generate chunk!" << '\n';
-  World::Chunk::Layer testLayer;
 
-  for (int x = 0; x < 16; x++)
-  for (int z = 0; z < 16; z++)
+  std::vector<World::Chunk::Layer> layers;
+  for (int y = 0; y < 17; y++)
   {
-    //std::cout << "X: " << x << " Z: " << z << '\n';
-    testLayer.setBlock(x, z, World::Block::BlockType::GRASS);
-  }
-  
-  World::Chunk::ChunkMeshBuilder builder(testLayer);
-  builder.buildMesh(testLayer.mesh);
-  testLayer.mesh.buffer();
+    World::Chunk::Layer layer({0, y, 0});
 
-  chunkTest.add(testLayer.mesh);
+    for (int x = 0; x < 16; x++)
+    for (int z = 0; z < 16; z++)
+    {
+      if (y == 0)
+      {
+        layer.setShouldGenerateBottomFace(true);
+        layer.setBlock(x, z, World::Block::BlockType::STONE);
+      }
+      if (y < 6)
+        layer.setBlock(x, z, World::Block::BlockType::STONE);
+      else if (y >= 6 && y < 15)
+        layer.setBlock(x, z, World::Block::BlockType::DIRT);
+      else if (y == 15)
+      {
+        layer.setShouldGenerateTopFace(true);
+        layer.setBlock(x, z, World::Block::BlockType::GRASS);
+      }
+      else
+        layer.setBlock(x, z, World::Block::BlockType::AIR);
+    }
+
+    layers.push_back(layer);
+  }
+
+  for (size_t i{0}; i < layers.size(); i++)
+  {
+    auto& layer = layers.at(i);
+
+    layer.makeMesh();
+    layer.buffer();
+    chunkTest.add(layer.mesh);
+  }
+
   std::cout << "End of generate chunk!" << '\n';
 
   FPSCounter fpsCount;
@@ -191,6 +186,7 @@ int main() {
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 
     test.render(cam);
     chunkTest.render(cam);

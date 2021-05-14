@@ -16,21 +16,29 @@ void ChunkMesh::addFace(const std::vector<float>& faceVertices,
 {
     auto& vertices = mesh.vertexPositions;
     auto& texCoords = mesh.textureCoords;
-
-    //for (size_t i = 0; i < textureCoords.size(); i++)
-    //    std::cout << "Current texture coords data: " << textureCoords[i] << '\n';
-    
+    auto& indices = mesh.indices;
 
     texCoords.insert(texCoords.end(), textureCoords.begin(), textureCoords.end());
 
-    for (int i = 0, index = 0; i < 6; i++)
+    for (int i = 0, index = 0; i < 4; i++)
     {
-        //std::cout << "Current vertex data: " << faceVertices[index] << '\n';
-
-        vertices.push_back(faceVertices[index++] + chunkPos.x * CHUNK_SIZE + blockPos.x);
-        vertices.push_back(faceVertices[index++] + chunkPos.y * CHUNK_SIZE + blockPos.y);
-        vertices.push_back(faceVertices[index++] + chunkPos.z * CHUNK_SIZE + blockPos.z);
+        vertices.push_back(faceVertices[index++] + chunkPos.x + blockPos.x);
+        vertices.push_back(faceVertices[index++] + chunkPos.y + blockPos.y);
+        vertices.push_back(faceVertices[index++] + chunkPos.z + blockPos.z);
     }
+
+    indices.insert(indices.end(),
+    {
+        indicesIndex,
+        indicesIndex + 1,
+        indicesIndex + 2,
+        indicesIndex + 2,
+        indicesIndex + 3,
+        indicesIndex
+    }
+    );
+
+    indicesIndex += 4;
 }
 
 void ChunkMesh::buffer()
@@ -39,14 +47,23 @@ void ChunkMesh::buffer()
 
     mesh.vertexPositions.clear();
     mesh.textureCoords.clear();
+    mesh.indices.clear();
 
     mesh.vertexPositions.shrink_to_fit();
     mesh.textureCoords.shrink_to_fit();
+    mesh.indices.shrink_to_fit();
+
+    indicesIndex = 0;
 }
 
 const Model& ChunkMesh::getModel() const
 {
     return model;
+}
+
+void ChunkMesh::deleteData()
+{
+    model.deleteData();
 }
 
 } // namespace World::Chunk

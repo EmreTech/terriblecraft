@@ -3,11 +3,11 @@
 
 #include <glm/vec2.hpp>
 
-#include <array>
+#include <vector>
 
 namespace World::Block {
 
-std::array<glm::vec2, 6> GetTextureCoords(int column, int row, int face);
+std::vector<float> GetTextureCoords(int column, int row);
 
 } // namespace World::Block
 

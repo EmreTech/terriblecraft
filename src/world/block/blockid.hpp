@@ -10,6 +10,7 @@ typedef uint8_t block_t;
 enum class BlockType : block_t {
   AIR,
   GRASS,
+  FULL_GRASS,
   DIRT,
   STONE,
 

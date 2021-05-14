@@ -30,7 +30,7 @@ void ChunkRenderer::render(const World::Player::Camera& cam)
     for (const World::Chunk::ChunkMesh* mesh : chunks)
     {
         mesh->getModel().vao.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawElements(GL_TRIANGLES, mesh->getModel().numOfIndices, GL_UNSIGNED_INT, NULL);
     }
 }
 

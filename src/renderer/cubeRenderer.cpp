@@ -5,20 +5,6 @@
 #include "../world/player/camera.hpp"
 #include "../utils/types.hpp"
 
-std::vector<float> vecTwoToFloat(std::array<glm::vec2, 6> vec)
-{
-    std::vector<float> output;
-    for (size_t i{0}; i < vec.size(); i++)
-    {
-        auto cx = vec.at(i).x;
-        auto cy = vec.at(i).y;
-
-        output.push_back(cx);
-        output.push_back(cy);
-    }
-    return output;
-}
-
 namespace Renderer
 {
 
@@ -28,66 +14,77 @@ CubeRenderer::CubeRenderer()
 
     std::vector<float> vertex
     {
-        // Back face
-        -0.5f, -0.5f, -0.5f, // Bottom-left
-        0.5f, 0.5f, -0.5f,   // top-right
-        0.5f, -0.5f, -0.5f,  // bottom-right
-        0.5f, 0.5f, -0.5f,   // top-right
-        -0.5f, -0.5f, -0.5f, // bottom-left
-        -0.5f, 0.5f, -0.5f,  // top-left
-        // Front face
-        -0.5f, -0.5f, 0.5f, // bottom-left
-        0.5f, -0.5f, 0.5f,  // bottom-right
-        0.5f, 0.5f, 0.5f,   // top-right
-        0.5f, 0.5f, 0.5f,   // top-right
-        -0.5f, 0.5f, 0.5f,  // top-left
-        -0.5f, -0.5f, 0.5f, // bottom-left
-        // Left face
-        -0.5f, 0.5f, 0.5f,   // top-right
-        -0.5f, 0.5f, -0.5f,  // top-left
-        -0.5f, -0.5f, -0.5f, // bottom-left
-        -0.5f, -0.5f, -0.5f, // bottom-left
-        -0.5f, -0.5f, 0.5f,  // bottom-right
-        -0.5f, 0.5f, 0.5f,   // top-right
-        // Right face
-        0.5f, 0.5f, 0.5f,    // top-left
-        0.5f, -0.5f, -0.5f,  // bottom-right
-        0.5f, 0.5f, -0.5f,   // top-right
-        0.5f, -0.5f, -0.5f,  // bottom-right
-        0.5f, 0.5f, 0.5f,    // top-left
-        0.5f, -0.5f, 0.5f,   // bottom-left
-        // Bottom face
-        -0.5f, -0.5f, -0.5f, // top-right
-        0.5f, -0.5f, -0.5f,  // top-left
-        0.5f, -0.5f, 0.5f,   // bottom-left
-        0.5f, -0.5f, 0.5f,   // bottom-left
-        -0.5f, -0.5f, 0.5f,  // bottom-right
-        -0.5f, -0.5f, -0.5f, // top-right
-        // Top face
-        -0.5f, 0.5f, -0.5f, // top-left
-        0.5f, 0.5f, 0.5f,   // bottom-right
-        0.5f, 0.5f, -0.5f,  // top-right
-        0.5f, 0.5f, 0.5f,   // bottom-right
-        -0.5f, 0.5f, -0.5f, // top-left
-        -0.5f, 0.5f, 0.5f,  // bottom-left
+        //Back
+        1, 0, 0,
+        0, 0, 0,
+        0, 1, 0,
+        1, 1, 0,
+
+        //Front
+        0, 0, 1,
+        1, 0, 1,
+        1, 1, 1,
+        0, 1, 1,
+
+        //Right
+        1, 0, 1,
+        1, 0, 0,
+        1, 1, 0,
+        1, 1, 1,
+
+        //Left
+        0, 0, 0,
+        0, 0, 1,
+        0, 1, 1,
+        0, 1, 0,
+
+        //Top
+        0, 1, 1,
+        1, 1, 1,
+        1, 1, 0,
+        0, 1, 0,
+
+        //Bottom
+        0, 0, 0,
+        1, 0, 0,
+        1, 0, 1,
+        0, 0, 1
     };
 
-    auto back = vecTwoToFloat(World::Block::GetTextureCoords(1, 0, 0));
-    auto front = vecTwoToFloat(World::Block::GetTextureCoords(1, 0, 1));
-    auto left = vecTwoToFloat(World::Block::GetTextureCoords(1, 0, 2));
-    auto right = vecTwoToFloat(World::Block::GetTextureCoords(1, 0, 3));
-    auto bottom = vecTwoToFloat(World::Block::GetTextureCoords(2, 0, 4));
-    auto top = vecTwoToFloat(World::Block::GetTextureCoords(0, 0, 5));
+    auto top = World::Block::GetTextureCoords(0, 0);
+    auto side = World::Block::GetTextureCoords(1, 0);
+    auto bottom = World::Block::GetTextureCoords(2, 0);
 
     std::vector<float> texCoords;
-    texCoords.insert(texCoords.end(), back.begin(),   back.end()); // Back
-    texCoords.insert(texCoords.end(), front.begin(),  front.end()); // Front
-    texCoords.insert(texCoords.end(), left.begin(),   left.end()); // Left
-    texCoords.insert(texCoords.end(), right.begin(),  right.end()); // Right
-    texCoords.insert(texCoords.end(), bottom.begin(), bottom.end()); // Bottom
-    texCoords.insert(texCoords.end(), top.begin(),    top.end()); // Top
+    texCoords.insert(texCoords.end(), side.begin(),     side.end()); // Back
+    texCoords.insert(texCoords.end(), side.begin(),     side.end()); // Front
+    texCoords.insert(texCoords.end(), side.begin(),     side.end()); // Right
+    texCoords.insert(texCoords.end(), side.begin(),     side.end()); // Left
+    texCoords.insert(texCoords.end(), top.begin(),      top.end()); // Top
+    texCoords.insert(texCoords.end(), bottom.begin(),   bottom.end()); // Bottom
 
-    cubeModel.addMeshData({vertex, texCoords});
+    std::vector<GLuint> indices
+    {
+        0, 1, 2,
+        2, 3, 0,
+
+        4, 5, 6,
+        6, 7, 4,
+
+        8, 9, 10,
+        10, 11, 8,
+
+        12, 13, 14,
+        14, 15, 12,
+
+        16, 17, 18,
+        18, 19, 16,
+
+        20, 21, 22,
+        22, 23, 20
+    };
+
+    cubeModel.addMeshData({vertex, texCoords, indices});
 }
 
 void CubeRenderer::add(const glm::vec3& pos)
@@ -114,7 +111,7 @@ void CubeRenderer::render(const World::Player::Camera& cam)
         model = glm::translate(model, quad);
         shader.uniformMatrix4("model", model);
 
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawElements(GL_TRIANGLES, cubeModel.numOfIndices, GL_UNSIGNED_INT, NULL);
     }
 }
 
