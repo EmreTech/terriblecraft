@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "layer.hpp"
+#include "chunkSection.hpp"
 #include "chunkMesh.hpp"
 #include "../block/blockatlas.hpp"
 #include "../block/blockdata.hpp"
@@ -83,27 +83,25 @@ struct AdjacentBlockPositions
     glm::vec3 back;
 };
 
-ChunkMeshBuilder::ChunkMeshBuilder(Layer& chunk) : pLayer(&chunk) {}
+ChunkMeshBuilder::ChunkMeshBuilder(ChunkSection& chunk) : pChunk(&chunk) {}
 
 int faces = 0;
 
 void ChunkMeshBuilder::buildMesh(ChunkMesh& mesh)
 {
-    // BUG: Top and bottom faces are not generating
-
     pMesh = &mesh;
     AdjacentBlockPositions directions;
 
     //std::cout << "Start chunk mesh build" << '\n';
 
-    for (float i = 0; i < CHUNK_AREA; i++)
+    for (float i = 0; i < CHUNK_VOLUME; i++)
     {
         float x = (int) i % CHUNK_SIZE;
-        float y = 0.0f;
+        float y = (int) i / CHUNK_AREA;
         float z = ((int) i / CHUNK_SIZE) % CHUNK_SIZE;
 
         glm::vec3 position(x, y, z);
-        Block::Block b = pLayer->getBlock(x, z);
+        Block::Block b = pChunk->getBlock(x, y, z);
 
         if (b == Block::BlockType::AIR)
             continue;
@@ -112,14 +110,14 @@ void ChunkMeshBuilder::buildMesh(ChunkMesh& mesh)
         auto& data = *pBlockData;
         directions.update(x, y, z);
 
-        addFace(bottomFace, data.textureBottom, position, directions.down);
-        addFace(topFace,    data.textureTop,    position, directions.up);
-
-        addFace(leftFace,   data.textureSide,   position, directions.left);
-        addFace(rightFace,  data.textureSide,   position, directions.right);
-
-        addFace(frontFace,  data.textureSide,   position, directions.front);
         addFace(backFace,   data.textureSide,   position, directions.back);
+        addFace(frontFace,  data.textureSide,   position, directions.front);
+
+        addFace(rightFace,  data.textureSide,   position, directions.right);
+        addFace(leftFace,   data.textureSide,   position, directions.left);
+
+        addFace(topFace,    data.textureTop,    position, directions.up);
+        addFace(bottomFace, data.textureBottom, position, directions.down);
     }
 
     //std::cout << "Finish chunk mesh build!" << '\n';
@@ -135,13 +133,13 @@ void ChunkMeshBuilder::addFace(const std::vector<float>& blockFace,
         faces++;
         auto texCoords = World::Block::GetTextureCoords(textureCoords.x, textureCoords.y);
 
-        pMesh->addFace(blockFace, texCoords, pLayer->getPosition(), blockPos);
+        pMesh->addFace(blockFace, texCoords, pChunk->getPosition(), blockPos);
     }
 }
 
 bool ChunkMeshBuilder::makeFace(const glm::vec3& blockPos)
 {
-    auto block = pLayer->getBlock(blockPos.x, blockPos.z);
+    auto block = pChunk->getBlock(blockPos.x, blockPos.y, blockPos.z);
     auto& data = block.getData().getData();
     
     if (block == Block::BlockType::AIR)

@@ -6,15 +6,9 @@
 #include <vector>
 
 #include "../../utils/singleton.hpp"
-#include "layer.hpp"
+#include "chunkSection.hpp"
 
-namespace World {
-
-namespace Player {
-struct Camera;
-} // namespace Player
-
-namespace Chunk {
+namespace World::Chunk {
 
 struct Chunk {
   Chunk() = default;
@@ -22,15 +16,16 @@ struct Chunk {
 
   void generate();
 
-  void makeMesh(const Player::Camera &cam);
+  void makeMesh();
+  void buffer();
 
-  void addLayer();
-  void removeLayer(int y);
+  void addSection();
+  void removeSection(int y);
 
   void setBlock(int x, int y, int z, Block::Block b);
   Block::Block getBlock(int x, int y, int z) const noexcept;
 
-  Layer &getLayer(int index);
+  ChunkSection &getSection(int index);
 
   const glm::vec2 &getPosition() const;
 
@@ -39,14 +34,12 @@ private:
   bool xzOutOfBound(int x, int z) const noexcept;
   bool outOfBounds(int x, int y, int z) const noexcept;
 
-  std::vector<Layer> layers;
+  std::vector<ChunkSection> chunks;
   glm::vec2 position;
   
   bool generated = false;
 };
 
-} // namespace Chunk
-
-} // namespace World
+} // namespace World::Chunk
 
 #endif

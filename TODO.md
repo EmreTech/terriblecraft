@@ -11,9 +11,9 @@
 ## Block
 - [x] Make a block class that represents a single block with a few properties
 ## Chunks
-- [ ] Make a layer class that represents one layer in a chunk (stores 16 * 16 * 1 blocks)
-- [ ] Make a chunk class that stores blocks in a 16 * 16 * 16 area by using layers
-- [ ] Optimize chunks to not render invisible block faces
+- [x] Make a chunk section that represents 16 * 16 * 16 amount of blocks
+- [x] Make a chunk class that stores chunk sections in an infinte manner
+- [x] Optimize chunks to not render invisible block faces
 ## Enhancements
 - [ ] Lighting
 - [ ] Biomes
@@ -27,7 +27,6 @@
 - [x] Controlling the camera with the mouse is slightly broken
 - [x] Textures might be rotated on the side faces
 - [x] Texture atlas system doesn't show correctly (line in the middle)
-- [ ] You can see a bit of the background if you look carefully into the blocks
 
 # Also
 - Any comments in the code that starts with TODO, FIXME, or BUG.

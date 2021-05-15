@@ -16,12 +16,12 @@ struct BlockDataHolder;
 
 namespace Chunk
 {
-struct Layer;
+struct ChunkSection;
 struct ChunkMesh;  
 
 struct ChunkMeshBuilder
 {
-    ChunkMeshBuilder(Layer& chunk);
+    ChunkMeshBuilder(ChunkSection& chunk);
 
     void buildMesh(ChunkMesh& mesh);
 
@@ -33,8 +33,7 @@ struct ChunkMeshBuilder
 
     bool makeFace(const glm::vec3& blockPos);
 
-    // TODO: Switch over to using full chunks for building chunk meshes
-    Layer *pLayer = nullptr;
+    ChunkSection *pChunk = nullptr;
     ChunkMesh *pMesh = nullptr;
     const Block::BlockDataHolder* pBlockData = nullptr;
 };

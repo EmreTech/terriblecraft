@@ -7,6 +7,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) {
   WorldUp = up;
   Yaw = yaw;
   Pitch = pitch;
+  curY = Position.y + 1.0f;
   updateVectors();
 }
 
@@ -34,6 +35,8 @@ void Camera::Keyboard(int direction, float deltaTime) {
     std::cout << "Invalid direction number. Ignoring." << '\n';
     break;
   }
+
+  //Position.y = curY;
 }
 
 void Camera::Mouse(float xoffset, float yoffset, bool constrainPitch) {

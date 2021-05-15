@@ -53,5 +53,5 @@ void Model::deleteData()
     
     buffers.clear();
 
-    vboCount, numOfIndices = 0;
+    vboCount = 0, numOfIndices = 0;
 }

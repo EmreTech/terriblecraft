@@ -1,9 +1,9 @@
 #ifndef BLOCKATLAS_HPP
 #define BLOCKATLAS_HPP
 
-#include <glm/vec2.hpp>
-
 #include <vector>
+
+#include "../../utils/glm_include.hpp"
 
 namespace World::Block {
 

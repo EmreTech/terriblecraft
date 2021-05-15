@@ -2,10 +2,9 @@
 #define BLOCK_HPP
 
 #include "blockid.hpp"
+#include "blockdata.hpp"
 
 namespace World::Block {
-
-struct BlockData;
 
 struct Block {
   Block() = default;

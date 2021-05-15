@@ -12,22 +12,19 @@ ChunkMesh::ChunkMesh(){}
 void ChunkMesh::addFace(const std::vector<float>& faceVertices, 
                 const std::vector<float>& textureCoords,
                 const glm::vec3& chunkPos,
-                const glm::vec3& blockPos)
+                const glm::vec3& blockPos,
+                bool isTopBottom)
 {
-    auto& vertices = mesh.vertexPositions;
-    auto& texCoords = mesh.textureCoords;
-    auto& indices = mesh.indices;
-
-    texCoords.insert(texCoords.end(), textureCoords.begin(), textureCoords.end());
+    mesh.textureCoords.insert(mesh.textureCoords.end(), textureCoords.begin(), textureCoords.end());
 
     for (int i = 0, index = 0; i < 4; i++)
     {
-        vertices.push_back(faceVertices[index++] + chunkPos.x + blockPos.x);
-        vertices.push_back(faceVertices[index++] + chunkPos.y + blockPos.y);
-        vertices.push_back(faceVertices[index++] + chunkPos.z + blockPos.z);
+        mesh.vertexPositions.push_back(faceVertices[index++] + chunkPos.x + blockPos.x);
+        mesh.vertexPositions.push_back(faceVertices[index++] + chunkPos.y + blockPos.y);
+        mesh.vertexPositions.push_back(faceVertices[index++] + chunkPos.z + blockPos.z);
     }
 
-    indices.insert(indices.end(),
+    mesh.indices.insert(mesh.indices.end(),
     {
         indicesIndex,
         indicesIndex + 1,
