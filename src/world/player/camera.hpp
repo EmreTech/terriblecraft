@@ -8,7 +8,7 @@
 namespace World::Player {
 
 const float YAW = -90.0f, PITCH = 0.0f;
-const float SPEED = 5.0, SENSITIVITY = 0.2f;
+const float SPEED = 5.555f, SENSITIVITY = 0.2f;
 
 struct Camera {
   // Camera Attributes

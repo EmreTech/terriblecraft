@@ -18,7 +18,7 @@ struct Block {
 
   bool operator!=(Block other) const { return !(*this == other); }
 
-  block_t id = 0;
+  block_t id = static_cast<block_t>(BlockType::AIR);
 };
 
 } // namespace World::Block

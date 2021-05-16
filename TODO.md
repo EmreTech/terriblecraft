@@ -19,6 +19,10 @@
 - [ ] Biomes
 - [ ] Map generation (with an optional seed)
 
+# Player
+- [ ] Make a player class that represents the player, and is linked to the camera
+- [ ] Implement raycasting for breaking/placing blocks
+
 # UI
 - [ ] An UI system
 - [ ] Main menu and pause menu

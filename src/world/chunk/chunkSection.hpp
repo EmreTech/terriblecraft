@@ -65,8 +65,6 @@ private:
   static bool outOfBounds(int val);
   int getIndex(int x, int y, int z) const;
 
-  void generate();
-
   std::array<Block::Block, CHUNK_VOLUME> blocks;
   std::array<Layer, CHUNK_SIZE> layers;
 

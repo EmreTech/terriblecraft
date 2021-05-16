@@ -4,27 +4,7 @@ namespace World::Chunk
 {
 
 Chunk::Chunk(const glm::vec2 &pos) : position(pos) 
-{
-    generate();
-}
-
-void Chunk::generate()
-{
-    if (!generated)
-    {
-        for (int i = 0; i < 5; i++)
-            addSection();
-
-        for (int y = 0; y < (int) chunks.size(); y++)
-        for (int x = 0; x < CHUNK_SIZE; x++)
-        for (int z = 0; z < CHUNK_SIZE; z++)
-        {
-            setBlock(x, y, z, Block::BlockType::AIR);
-        }
-
-        generated = true;
-    }
-}
+{}
 
 void Chunk::makeMesh()
 {
@@ -78,6 +58,11 @@ ChunkSection& Chunk::getSection(int index)
         return error;
 
     return chunks.at(index);
+}
+
+const glm::vec2& Chunk::getPosition() const
+{
+    return position;
 }
 
 bool Chunk::outOfBounds(int x, int y, int z) const noexcept

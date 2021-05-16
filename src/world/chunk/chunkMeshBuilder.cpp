@@ -63,6 +63,7 @@ namespace
 
 } // namespace
 
+// This is for testing nearby blocks to the current one to see which faces need to be renderered.
 struct AdjacentBlockPositions
 {
     void update(int x, int y, int z)

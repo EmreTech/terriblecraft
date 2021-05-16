@@ -3,7 +3,7 @@ UNAME_S:=$(shell uname -s)
 
 #### PROJECT SETTINGS ####
 # The name of the executable to be created
-BIN_NAME := test
+BIN_NAME := terriblecraft
 # Compiler used
 CXX ?= clang++
 # Extension of source files used in the project

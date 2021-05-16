@@ -5,17 +5,17 @@
 // stdlib includes
 #include <iostream>
 #include <vector>
+#include <random>
 
 // Local includes
-#include "gl/window.hpp" // End of GL includes
 #include "utils/clock.hpp"
 #include "utils/types.hpp"
 #include "utils/glm_include.hpp" // End of utils includes
-#include "world/chunk/chunkSection.hpp"
+#include "world/chunk/chunk.hpp"
 #include "world/chunk/chunkMeshBuilder.hpp"
 #include "world/player/camera.hpp" // End of world includes
-#include "renderer/cubeRenderer.hpp"
 #include "renderer/chunkRenderer.hpp"
+#include "renderer/skyboxRenderer.hpp"
 
 // Rewrite! Starting again with GLFW instead of SFML (like the original)
 // I didn't get much done with the original write anyways...
@@ -106,16 +106,51 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   cam.Mouse(xoffset, yoffset);
 }
 
+void resize_window_event(GLFWwindow *win, int width, int height) {
+  glViewport(0, 0, width, height);
+}
+
 int main() {
+  //float r = 9.0f, g = 139.0f, b = 244.0f;
+  float r = 0.1f, g = 0.1f, b = 0.1f;
+
   // Init GLFW
-  gl::Window Window;
-  Window.init();
+
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, TRUE);
+#endif
+
+  GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "TerribleCraft", NULL, NULL);
+  if (!window)
+  {
+    std::cout << "Failed to create window. You might not have the right OpenGL version installed." << '\n';
+    glfwTerminate();
+    return -1;
+  }
+
+  glfwMakeContextCurrent(window);
+
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    std::cout << "Failed to initialize Glad (OpenGL)" << '\n';
+    glfwTerminate();
+    return -1;
+  }
+
+  glfwSetFramebufferSizeCallback(window, resize_window_event);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
   Clock c;
 
-  glfwSetCursorPosCallback(Window.window, mouse_callback);
+  glfwSetCursorPosCallback(window, mouse_callback);
 
   // Setup OpenGL for rendering
-  Renderer::CubeRenderer test;
+  glEnable(GL_DEPTH_TEST);
+
+  Renderer::SkyboxRenderer skybox;
   Renderer::ChunkRenderer chunkTest;
 
   World::Chunk::ChunkSection sec;
@@ -136,42 +171,45 @@ int main() {
       sec.setBlock(x, y, z, World::Block::BlockType::STONE);
   }
 
-  sec.makeMesh();
-  sec.buffer();
-  chunkTest.add(sec.mesh);
-
-  test.add({-3, 0, 0});
-
   FPSCounter fpsCount;
+
   // Game loop!
-  while (!glfwWindowShouldClose(Window.window)) {
+  while (!glfwWindowShouldClose(window)) {
     // Calculate the delta time
     float currentFrame = c.elapsed();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
     // Process any input
-    processInput(Window.window);
+    processInput(window);
 
     // Update the FPS count (not related to delta time calculation at all)
     fpsCount.update();
-    Window.setTitle("TerribleCraft - FPS: " + std::to_string(fpsCount.fps));
+    glfwSetWindowTitle(window, ("TerribleCraft - FPS: " + std::to_string(fpsCount.fps)).c_str());
+
+    if (sec.getHasMesh() && sec.buffered())
+      sec.deleteMeshes();
+    sec.makeMesh();
+    sec.buffer();
+    chunkTest.add(sec.mesh);
 
     // Render
 
     // Clear the color and depth buffer every new render frame
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClearColor(r / 255, g / 255, b / 255, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
 
-    test.render(cam);
     chunkTest.render(cam);
 
+    glDepthFunc(GL_LEQUAL);
+    skybox.render(cam);
+    glDepthFunc(GL_LESS);
+
     // GLFW: Swap buffers and poll events
-    glfwSwapBuffers(Window.window);
+    glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  Window.quit();
+  glfwTerminate();
   return EXIT_SUCCESS;
 }

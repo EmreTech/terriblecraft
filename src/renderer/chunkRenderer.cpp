@@ -32,6 +32,8 @@ void ChunkRenderer::render(const World::Player::Camera& cam)
         mesh->getModel().vao.bind();
         glDrawElements(GL_TRIANGLES, mesh->getModel().numOfIndices, GL_UNSIGNED_INT, NULL);
     }
+
+    chunks.clear();
 }
 
 } // namespace Renderer

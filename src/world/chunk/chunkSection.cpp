@@ -9,13 +9,10 @@ namespace World::Chunk {
 ChunkSection::ChunkSection() 
 { 
   position = {0, 0, 0};
-  generate();
 }
 
 ChunkSection::ChunkSection(const glm::vec3& pos) : position(pos) 
-{
-  generate();
-}
+{}
 
 void ChunkSection::setBlock(int x, int y, int z, Block::Block b) {
   if (outOfBounds(x) || outOfBounds(y) || outOfBounds(z))
@@ -101,18 +98,6 @@ bool ChunkSection::outOfBounds(int val) {
 
 int ChunkSection::getIndex(int x, int y, int z) const { 
   return y * CHUNK_AREA + z * CHUNK_SIZE + x; 
-}
-
-void ChunkSection::generate()
-{
-  for (int y = 0; y < CHUNK_SIZE; y++)
-  for (int x = 0; x < CHUNK_SIZE; x++)
-  for (int z = 0; z < CHUNK_SIZE; z++)
-  {
-    setBlock(x, y, z, Block::BlockType::AIR);
-    Layer layer;
-    layers[y] = layer;
-  }
 }
 
 } // namespace World::Chunk

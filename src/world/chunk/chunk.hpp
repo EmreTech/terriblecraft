@@ -14,8 +14,6 @@ struct Chunk {
   Chunk() = default;
   Chunk(const glm::vec2 &pos);
 
-  void generate();
-
   void makeMesh();
   void buffer();
 

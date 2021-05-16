@@ -1,4 +1,4 @@
 *.xcf
 build/**
-test
+terriblecraft
 .vscode/**
