@@ -40,7 +40,7 @@ struct ChunkMeshBuilder
 
     /**
      * Checks if the block face should be added to the mesh.
-     * Ciertia:
+     * Criteria:
      * - Block face is pointing towards an air block
      * - Block face is pointing towards a non-opaque block
      */

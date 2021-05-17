@@ -8,19 +8,22 @@
 - [x] Make a texture atlas and create a function that can find the texture coordinates for a texture
 
 # World
+- [ ] Make a world class that manages all chunks in the word
+- [ ] Infite world generation!
 ## Block
 - [x] Make a block class that represents a single block with a few properties
 ## Chunks
 - [x] Make a chunk section that represents 16 * 16 * 16 amount of blocks
 - [x] Make a chunk class that stores chunk sections in an infinte manner
 - [x] Optimize chunks to not render invisible block faces
+- [ ] Optimize chunks to not render faces invisible by other chunks (causes an overlap)
+- [x] Height-map generation
 ## Enhancements
 - [ ] Lighting
 - [ ] Biomes
-- [ ] Map generation (with an optional seed)
 
 # Player
-- [ ] Make a player class that represents the player, and is linked to the camera
+- [ ] Make a player class that represents the player, and the camera is linked to it
 - [ ] Implement raycasting for breaking/placing blocks
 
 # UI

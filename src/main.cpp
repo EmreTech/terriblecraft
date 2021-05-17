@@ -1,4 +1,4 @@
-// Graphic libraries includes
+// Libraries includes
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -10,7 +10,8 @@
 // Local includes
 #include "utils/clock.hpp"
 #include "utils/types.hpp"
-#include "utils/glm_include.hpp" // End of utils includes
+#include "utils/glm_include.hpp"
+#include "utils/perlin_noise.hpp" // End of utils includes
 #include "world/chunk/chunk.hpp"
 #include "world/chunk/chunkMeshBuilder.hpp"
 #include "world/player/camera.hpp" // End of world includes
@@ -110,6 +111,16 @@ void resize_window_event(GLFWwindow *win, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
+int heightAt(int x, int z, int chunkX, int chunkZ)
+{
+  float xCoord = (x + (chunkX * CHUNK_SIZE)) * 0.1f;
+  float zCoord = (z + (chunkZ * CHUNK_SIZE)) * 0.1f;
+
+  auto generatedNoiseOne = PerlinNoise::getInstance().generateNoise( xCoord * 1.5f, zCoord * 1.5f, 0 ) * 10.0f;
+  auto generatedNoiseTwo = PerlinNoise::getInstance().generateNoise( xCoord, zCoord, 0) * 5.0f;
+  return generatedNoiseOne + generatedNoiseTwo;
+}
+
 int main() {
   //float r = 9.0f, g = 139.0f, b = 244.0f;
   float r = 0.1f, g = 0.1f, b = 0.1f;
@@ -117,6 +128,7 @@ int main() {
   // Init GLFW
 
   glfwInit();
+  Clock c;
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -142,9 +154,6 @@ int main() {
 
   glfwSetFramebufferSizeCallback(window, resize_window_event);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-  Clock c;
-
   glfwSetCursorPosCallback(window, mouse_callback);
 
   // Setup OpenGL for rendering
@@ -153,22 +162,35 @@ int main() {
   Renderer::SkyboxRenderer skybox;
   Renderer::ChunkRenderer chunkTest;
 
-  World::Chunk::ChunkSection sec;
+  World::Chunk::Chunk sec({0.0f, 0.0f});
 
-  for (int i = 0; i < CHUNK_VOLUME; i++)
+  for (int i = 0; i < CHUNK_VOLUME * 2; i++)
   {
     int x = i % CHUNK_SIZE;
     int y = i / CHUNK_AREA;
     int z = (i / CHUNK_SIZE) % CHUNK_SIZE;
 
-    if (y == 15)
-      sec.setBlock(x, y, z, World::Block::BlockType::GRASS);
+    if (y <= (CHUNK_SIZE - 1))
+    {
+        sec.setBlock(x, y, z, World::Block::BlockType::DIRT);
+    }
 
-    else if (y < 16 && y >= 6)
-      sec.setBlock(x, y, z, World::Block::BlockType::DIRT);
+    if (y > (CHUNK_SIZE - 1))
+    {
+        int newY = heightAt(x, z, sec.getPosition().x, sec.getPosition().y);
+        float baseLandHeight = CHUNK_SIZE + 2.0f + newY;
 
-    else if (y < 6)
-      sec.setBlock(x, y, z, World::Block::BlockType::STONE);
+        World::Block::Block b;
+        if (y <= baseLandHeight)
+        {
+            b = World::Block::BlockType::DIRT;
+
+            if (y > baseLandHeight - 1)
+                b = World::Block::BlockType::GRASS;
+        }
+
+        sec.setBlock(x, y, z, b);
+    }
   }
 
   FPSCounter fpsCount;
@@ -187,11 +209,9 @@ int main() {
     fpsCount.update();
     glfwSetWindowTitle(window, ("TerribleCraft - FPS: " + std::to_string(fpsCount.fps)).c_str());
 
-    if (sec.getHasMesh() && sec.buffered())
-      sec.deleteMeshes();
+    sec.deleteMeshes();
     sec.makeMesh();
-    sec.buffer();
-    chunkTest.add(sec.mesh);
+    sec.draw(chunkTest);
 
     // Render
 

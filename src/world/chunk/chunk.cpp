@@ -1,5 +1,9 @@
 #include "chunk.hpp"
 
+#include <iostream>
+
+#include "../../renderer/chunkRenderer.hpp"
+
 namespace World::Chunk
 {
 
@@ -12,16 +16,40 @@ void Chunk::makeMesh()
         layer.makeMesh();
 }
 
-void Chunk::buffer()
+void Chunk::deleteMeshes()
 {
     for (auto& layer : chunks)
-        layer.buffer();
+        layer.deleteMeshes();
+}
+
+void Chunk::draw(Renderer::ChunkRenderer& renderer)
+{
+    for (auto& layer : chunks)
+    {
+        if (!layer.buffered())
+            layer.buffer();
+
+        if (layer.getHasMesh() && layer.buffered())
+            renderer.add(layer.mesh);
+    }
 }
 
 void Chunk::addSection()
 {
     int y = chunks.size();
     chunks.push_back(glm::vec3(position.x, y, position.y));
+}
+
+void Chunk::addSections(int index)
+{
+    while ((int) chunks.size() < index + 1)
+        addSection();
+}
+
+void Chunk::addSectionsInBlocks(int blockY)
+{
+    int index = blockY / CHUNK_SIZE;
+    addSections(index);
 }
 
 void Chunk::removeSection(int y)
@@ -32,13 +60,13 @@ void Chunk::removeSection(int y)
 
 void Chunk::setBlock(int x, int y, int z, Block::Block b)
 {
-    addSection();
+    addSectionsInBlocks(y);
     
     if (outOfBounds(x, y, z))
         return;
 
     int bY = y % CHUNK_SIZE;
-    getSection(y / CHUNK_SIZE).setBlock(x, bY, z, b);
+    chunks.at(y / CHUNK_SIZE).setBlock(x, bY, z, b);
 }
 
 Block::Block Chunk::getBlock(int x, int y, int z) const noexcept
@@ -52,7 +80,7 @@ Block::Block Chunk::getBlock(int x, int y, int z) const noexcept
 
 ChunkSection& Chunk::getSection(int index)
 {
-    static ChunkSection error({444, 444, 444});
+    static ChunkSection error({0, 0, 0});
 
     if (index >= (int) chunks.size() || index < 0)
         return error;
@@ -63,6 +91,11 @@ ChunkSection& Chunk::getSection(int index)
 const glm::vec2& Chunk::getPosition() const
 {
     return position;
+}
+
+size_t Chunk::getAmountOfSections() const
+{
+    return chunks.size();
 }
 
 bool Chunk::outOfBounds(int x, int y, int z) const noexcept
