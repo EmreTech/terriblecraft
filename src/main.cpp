@@ -5,27 +5,33 @@
 // stdlib includes
 #include <iostream>
 #include <vector>
+#include <utility>
 #include <random>
 
 // Local includes
 #include "utils/clock.hpp"
 #include "utils/types.hpp"
 #include "utils/glm_include.hpp"
-#include "utils/perlin_noise.hpp" // End of utils includes
+#include "utils/perlin_noise.hpp"
+#include "utils/ray.hpp" // End of utils includes
 #include "world/chunk/chunk.hpp"
 #include "world/chunk/chunkMeshBuilder.hpp"
 #include "world/player/camera.hpp" // End of world includes
+#include "renderer/cubeRenderer.hpp"
 #include "renderer/chunkRenderer.hpp"
 #include "renderer/skyboxRenderer.hpp"
 
 // Rewrite! Starting again with GLFW instead of SFML (like the original)
 // I didn't get much done with the original write anyways...
 
+using CompressedBlocks = std::vector<std::pair<uint16_t, uint32_t>>;
+
 // Macro to check if a key was pressed
 #define BUTTON_PRESSED(win, key) glfwGetKey(win, key) == GLFW_PRESS
 
 // Camera
-World::Player::Camera cam(glm::vec3(8.0f, 17.0f, 8.0f));
+//World::Player::Camera cam(glm::vec3(8.0f, 17.0f, 8.0f));
+World::Player::Camera cam(glm::vec3(0.0f, 2.0f, 0.0f));
 float lastX = WINDOW_WIDTH / 2.0f, lastY = WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
 
@@ -36,6 +42,7 @@ float lastFrame = 0.0f;
 // Misc
 bool cursorCaptured = true, wireframe = false;
 Clock lastWireframeToggle, lastCursorCaptureToggle;
+World::Chunk::Chunk sec({0.0f, 0.0f});
 
 struct FPSCounter {
   float fps = 0;
@@ -121,6 +128,59 @@ int heightAt(int x, int z, int chunkX, int chunkZ)
   return generatedNoiseOne + generatedNoiseTwo;
 }
 
+CompressedBlocks compressChunk(World::Chunk::Chunk& chunk)
+{
+  CompressedBlocks output;
+  World::Block::Block currentBlock = chunk.getBlock(0, 0, 0);
+  uint32_t blockCount = 1;
+
+  for (uint32_t i = 1; i < (CHUNK_VOLUME * chunk.getAmountOfSections()); i++)
+  {
+    int x = i % CHUNK_SIZE;
+    int y = i / CHUNK_AREA;
+    int z = (i / CHUNK_SIZE) % CHUNK_SIZE;
+
+    auto block = chunk.getBlock(x, y, z);
+
+    if (block == currentBlock)
+      blockCount++;
+
+    else
+    {
+      output.emplace_back(currentBlock.id, blockCount);
+      currentBlock = block;
+      blockCount = 1;
+    }
+  }
+
+  output.emplace_back(currentBlock.id, blockCount);
+  return output;
+}
+
+World::Chunk::Chunk decompressChunk(const CompressedBlocks& blocks, const glm::vec2& pos)
+{
+  World::Chunk::Chunk output(pos);
+  int blockPointer = 0;
+
+  for (auto& block : blocks)
+  {
+    auto blockType = block.first;
+    auto count = block.second;
+
+    for (uint32_t i = 0; i < count; i++)
+    {
+      int x = blockPointer % CHUNK_SIZE;
+      int y = blockPointer / CHUNK_AREA;
+      int z = (blockPointer / CHUNK_SIZE) % CHUNK_SIZE;
+
+      output.setBlock(x, y, z, blockType);
+      blockPointer++;
+    }
+  }
+
+  return output;
+}
+
 int main() {
   //float r = 9.0f, g = 139.0f, b = 244.0f;
   float r = 0.1f, g = 0.1f, b = 0.1f;
@@ -162,8 +222,6 @@ int main() {
   Renderer::SkyboxRenderer skybox;
   Renderer::ChunkRenderer chunkTest;
 
-  World::Chunk::Chunk sec({0.0f, 0.0f});
-
   for (int i = 0; i < CHUNK_VOLUME * 2; i++)
   {
     int x = i % CHUNK_SIZE;
@@ -195,6 +253,9 @@ int main() {
 
   FPSCounter fpsCount;
 
+  sec.makeMesh();
+  Clock mDelay;
+
   // Game loop!
   while (!glfwWindowShouldClose(window)) {
     // Calculate the delta time
@@ -205,10 +266,40 @@ int main() {
     // Process any input
     processInput(window);
 
+    // TODO: Make breaking and placing blocks more accurate
+    Ray ray(cam.Position, cam.Yaw + 90.0f, cam.Pitch);
+    for (; ray.getLength() < 6; ray.step(1.0f))
+    {
+      int x = ray.getEnd().x;
+      int y = ray.getEnd().y;
+      int z = ray.getEnd().z;
+
+      auto block = sec.getBlock(x, y, z);
+
+      if (block != World::Block::BlockType::AIR)
+      {
+        if (mDelay.elapsed() > 0.2f)
+        {
+          mDelay.restart();
+          if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+          {
+            sec.setBlock(x, y, z, World::Block::BlockType::AIR);
+          }
+
+          if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+          {
+            ray.step(-1.0f);
+            sec.setBlock(x, y, z, World::Block::BlockType::STONE);
+          }
+        }
+      }
+    }
+
     // Update the FPS count (not related to delta time calculation at all)
     fpsCount.update();
     glfwSetWindowTitle(window, ("TerribleCraft - FPS: " + std::to_string(fpsCount.fps)).c_str());
 
+    // BUG: Remaking meshes takes up a lot of memory
     sec.deleteMeshes();
     sec.makeMesh();
     sec.draw(chunkTest);

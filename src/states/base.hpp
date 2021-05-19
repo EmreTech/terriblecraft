@@ -6,8 +6,7 @@ namespace States
 
 struct StateBase
 {
-    StateBase() = default;
-    virtual ~StateBase() = default;
+    virtual ~StateBase() = 0;
 
     virtual void handleInput() = 0;
 

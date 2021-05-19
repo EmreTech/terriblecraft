@@ -4,6 +4,7 @@
 
 #include "../world/player/camera.hpp"
 #include "../utils/types.hpp"
+#include "renderInfo.hpp"
 
 namespace Renderer
 {
@@ -95,7 +96,7 @@ void CubeRenderer::add(const glm::vec3& pos)
 void CubeRenderer::render(const World::Player::Camera& cam)
 {
     shader.activate();
-    cubeModel.vao.bind();
+    cubeModel.getRenderInfo().vao.bind();
     atlasTexture.bind();
 
     glm::mat4 projection = glm::perspective(
@@ -111,7 +112,7 @@ void CubeRenderer::render(const World::Player::Camera& cam)
         model = glm::translate(model, quad);
         shader.uniformMatrix4("model", model);
 
-        glDrawElements(GL_TRIANGLES, cubeModel.numOfIndices, GL_UNSIGNED_INT, NULL);
+        glDrawElements(GL_TRIANGLES, cubeModel.getIndicesCount(), GL_UNSIGNED_INT, NULL);
     }
 }
 

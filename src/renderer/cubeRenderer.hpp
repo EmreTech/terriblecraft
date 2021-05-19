@@ -9,6 +9,8 @@
 #include "../world/block/blockatlas.hpp"
 #include "../world/player/camera.hpp"
 
+struct RenderInfo;
+
 namespace Renderer
 {
 

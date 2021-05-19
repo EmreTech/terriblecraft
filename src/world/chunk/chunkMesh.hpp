@@ -9,7 +9,7 @@ namespace World::Chunk
 
 struct ChunkMesh
 {
-    ChunkMesh();
+    ChunkMesh() = default;
 
     void addFace(const std::vector<float>& faceVertices, 
                 const std::vector<float>& textureCoords,
@@ -21,6 +21,8 @@ struct ChunkMesh
 
     const Model& getModel() const;
     void deleteData();
+
+    int faces = 0;
 
     private:
     Mesh mesh;

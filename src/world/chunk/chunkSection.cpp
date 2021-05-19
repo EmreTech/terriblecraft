@@ -20,9 +20,8 @@ void ChunkSection::setBlock(int x, int y, int z, Block::Block b) {
     return;
   }
 
-  layers[y].update(b);
-  auto index = getIndex(x, y, z);
-  blocks[index] = b;
+  layers.at(y).update(b);
+  blocks[getIndex(x, y, z)] = b;
 }
 
 Block::Block ChunkSection::getBlock(int x, int y, int z) const {
@@ -31,8 +30,7 @@ Block::Block ChunkSection::getBlock(int x, int y, int z) const {
     return Block::BlockType::AIR;
   }
 
-  auto index = getIndex(x, y, z);
-  return blocks[index];
+  return blocks.at(getIndex(x, y, z));
 }
 
 const glm::vec3 ChunkSection::getPosition() const { return position; }
@@ -65,31 +63,33 @@ void ChunkSection::buffer()
   }
 }
 
+const ChunkSection::Layer& ChunkSection::getLayer(int y) const
+{
+  // TODO: Properly search for the right layer in the if-else statements below
+  if (y == -1)
+  {
+    return layers.at(0);
+  }
+
+  else if (y == CHUNK_SIZE)
+  {
+    return layers.at(15);
+  }
+
+  else
+  {
+    return layers.at(y);
+  }
+}
+
 void ChunkSection::deleteMeshes()
 {
   if (hasMesh)
   {
-    bufferedMesh = false;
-    hasMesh = false;
     mesh.deleteData();
+    hasMesh = false;
+    bufferedMesh = false;
   }
-}
-
-void ChunkSection::setShouldGenerateTopFace(bool val)
-{
-  topFace = val;
-}
-bool ChunkSection::getShouldGenerateTopFace() const
-{
-  return topFace;
-}
-void ChunkSection::setShouldGenerateBottomFace(bool val)
-{
-  bottomFace = val;
-}
-bool ChunkSection::getShouldGenerateBottomFace() const
-{
-  return bottomFace;
 }
 
 bool ChunkSection::outOfBounds(int val) { 

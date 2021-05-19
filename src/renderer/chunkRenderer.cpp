@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "renderInfo.hpp"
+
 namespace Renderer
 {
 
@@ -12,11 +14,16 @@ ChunkRenderer::ChunkRenderer()
 
 void ChunkRenderer::add(const World::Chunk::ChunkMesh& mesh)
 {
-    chunks.push_back(&mesh);
+    chunks.push_back( &mesh.getModel().getRenderInfo() );
 }
 
 void ChunkRenderer::render(const World::Player::Camera& cam)
 {
+    if (chunks.empty())
+        return;
+
+    glEnable(GL_CULL_FACE);
+
     shader.activate();
     atlasTexture.bind();
 
@@ -27,10 +34,10 @@ void ChunkRenderer::render(const World::Player::Camera& cam)
     shader.uniformMatrix4("projection", projection);
     shader.uniformMatrix4("view", cam.ViewMatrix());
 
-    for (const World::Chunk::ChunkMesh* mesh : chunks)
+    for (auto mesh : chunks)
     {
-        mesh->getModel().vao.bind();
-        glDrawElements(GL_TRIANGLES, mesh->getModel().numOfIndices, GL_UNSIGNED_INT, NULL);
+        mesh->vao.bind();
+        glDrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, NULL);
     }
 
     chunks.clear();

@@ -9,6 +9,8 @@
 #include "../world/player/camera.hpp"
 #include "../world/chunk/chunkMesh.hpp"
 
+struct RenderInfo;
+
 namespace Renderer
 {
 
@@ -20,7 +22,7 @@ struct ChunkRenderer
     void render(const World::Player::Camera& cam);
 
     private:
-    std::vector<const World::Chunk::ChunkMesh*> chunks;
+    std::vector<const RenderInfo *> chunks;
 
     gl::Texture atlasTexture;
     gl::Shader shader = gl::Shader("shaders/chunkVertex.glsl", "shaders/frag.glsl");

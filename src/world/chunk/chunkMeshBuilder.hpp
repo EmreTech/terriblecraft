@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../../utils/glm_include.hpp"
+#include "chunkSection.hpp"
 
 namespace World
 {
@@ -16,7 +17,6 @@ struct BlockDataHolder;
 
 namespace Chunk
 {
-struct ChunkSection;
 struct ChunkMesh;  
 
 struct ChunkMeshBuilder
@@ -45,6 +45,8 @@ struct ChunkMeshBuilder
      * - Block face is pointing towards a non-opaque block
      */
     bool makeFace(const glm::vec3& blockPos);
+
+    bool makeLayer(int y);
 
     ChunkSection *pChunk = nullptr;
     ChunkMesh *pMesh = nullptr;

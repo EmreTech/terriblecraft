@@ -55,12 +55,6 @@ public:
 
   void deleteMeshes();
 
-  void setShouldGenerateTopFace(bool val);
-  bool getShouldGenerateTopFace() const;
-
-  void setShouldGenerateBottomFace(bool val);
-  bool getShouldGenerateBottomFace() const;
-
 private:
   static bool outOfBounds(int val);
   int getIndex(int x, int y, int z) const;
@@ -70,8 +64,6 @@ private:
 
   glm::vec3 position;
   bool hasMesh, bufferedMesh = false;
-
-  bool topFace, bottomFace = false;
 };
 
 } // namespace World::Chunk

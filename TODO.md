@@ -9,12 +9,13 @@
 
 # World
 - [ ] Make a world class that manages all chunks in the word
-- [ ] Infite world generation!
+- [ ] Infinite world generation!
+- [x] Compress and decompress chunk data
 ## Block
 - [x] Make a block class that represents a single block with a few properties
 ## Chunks
 - [x] Make a chunk section that represents 16 * 16 * 16 amount of blocks
-- [x] Make a chunk class that stores chunk sections in an infinte manner
+- [x] Make a chunk class that stores chunk sections in an Infinite manner
 - [x] Optimize chunks to not render invisible block faces
 - [ ] Optimize chunks to not render faces invisible by other chunks (causes an overlap)
 - [x] Height-map generation

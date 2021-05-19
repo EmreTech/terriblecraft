@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "chunkSection.hpp"
 #include "chunkMesh.hpp"
 #include "../block/blockatlas.hpp"
 #include "../block/blockdata.hpp"
@@ -101,6 +100,9 @@ void ChunkMeshBuilder::buildMesh(ChunkMesh& mesh)
         float y = (int) i / CHUNK_AREA;
         float z = ((int) i / CHUNK_SIZE) % CHUNK_SIZE;
 
+        if (!makeLayer(y))
+            continue;
+
         glm::vec3 position(x, y, z);
         Block::Block b = pChunk->getBlock(x, y, z);
 
@@ -150,6 +152,13 @@ bool ChunkMeshBuilder::makeFace(const glm::vec3& blockPos)
         return true;
 
     return false;
+}
+
+bool ChunkMeshBuilder::makeLayer(int y)
+{
+    return (!pChunk->getLayer(y).isAllSolid()) ||
+            (!pChunk->getLayer(y + 1).isAllSolid()) ||
+            (!pChunk->getLayer(y - 1).isAllSolid());
 }
 
 } // namespace World::Chunk

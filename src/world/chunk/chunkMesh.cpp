@@ -7,14 +7,13 @@
 namespace World::Chunk
 {
 
-ChunkMesh::ChunkMesh(){}
-
 void ChunkMesh::addFace(const std::vector<float>& faceVertices, 
                 const std::vector<float>& textureCoords,
                 const glm::vec3& chunkPos,
                 const glm::vec3& blockPos,
                 bool isTopBottom)
 {
+    faces++;
     mesh.textureCoords.insert(mesh.textureCoords.end(), textureCoords.begin(), textureCoords.end());
 
     for (int i = 0, index = 0; i < 4; i++)
