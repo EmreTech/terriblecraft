@@ -181,6 +181,14 @@ World::Chunk::Chunk decompressChunk(const CompressedBlocks& blocks, const glm::v
   return output;
 }
 
+glm::vec3 toBlockPos(const glm::vec3& vec)
+{
+  auto x = static_cast<int>(floor(vec.x));
+  auto y = static_cast<int>(floor(vec.y));
+  auto z = static_cast<int>(floor(vec.z));
+  return {x, y, z};
+}
+
 int main() {
   //float r = 9.0f, g = 139.0f, b = 244.0f;
   float r = 0.1f, g = 0.1f, b = 0.1f;
@@ -266,30 +274,28 @@ int main() {
     // Process any input
     processInput(window);
 
-    // TODO: Make breaking and placing blocks more accurate
-    Ray ray(cam.Position, cam.Yaw + 90.0f, cam.Pitch);
-    for (; ray.getLength() < 6; ray.step(1.0f))
+    bool leftMouse  = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    bool rightMouse = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+
+    Ray ray(cam.Position, cam.Front);
+    for (; ray.getLength() < 8; ray.step())
     {
-      int x = ray.getEnd().x;
-      int y = ray.getEnd().y;
-      int z = ray.getEnd().z;
+      auto rayBlockPos = toBlockPos(ray.getEnd());
 
-      auto block = sec.getBlock(x, y, z);
-
-      if (block != World::Block::BlockType::AIR)
+      if (true)
       {
-        if (mDelay.elapsed() > 0.2f)
+        if (mDelay.elapsed() > 0.1f)
         {
           mDelay.restart();
-          if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+          if (leftMouse)
           {
-            sec.setBlock(x, y, z, World::Block::BlockType::AIR);
+            sec.setBlock(rayBlockPos.x, rayBlockPos.y, rayBlockPos.z, World::Block::BlockType::AIR);
           }
 
-          if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+          if (rightMouse)
           {
-            ray.step(-1.0f);
-            sec.setBlock(x, y, z, World::Block::BlockType::STONE);
+            rayBlockPos = toBlockPos(ray.getLast());
+            sec.setBlock(rayBlockPos.x, rayBlockPos.y, rayBlockPos.z, World::Block::BlockType::STONE);
           }
         }
       }
