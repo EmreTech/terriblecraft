@@ -11,14 +11,14 @@ SRC_EXT := cpp
 # Path to the source directory, relative to the makefile
 SRC_PATH := src
 # Space-separated pkg-config libraries used by this project
-LIBS := glfw3
+LIBS := sfml-graphics
 # General compiler flags
 COMPILE_FLAGS := -std=c++17 -Wall -Wextra -g
 # Add additional include paths
 INCLUDES := -I src -I src/libs/glad/include -I src/libs/glm/include -I src/libs/stb_image
 # General linker settings
 ifeq ($(UNAME_S),Darwin)
-	LINK_FLAGS = -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon
+	LINK_FLAGS = -framework OpenGL #-framework CoreVideo -framework IOKit -framework Cocoa -framework Carbon
 else
 	LINK_FLAGS = 
 endif

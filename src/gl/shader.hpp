@@ -15,6 +15,8 @@ namespace gl {
 struct Shader {
   unsigned int ID;
 
+  Shader() = default;
+
   Shader(const std::string vertexPath, const std::string fragPath) {
     init(vertexPath, fragPath);
   }

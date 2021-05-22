@@ -8,19 +8,10 @@ struct Clock {
   Clock() { start(); }
 
   // Restarts the clock and returns the current clock value.
-  float restart() {
-    float elapse = elapsed();
-    start();
-    return elapse;
-  }
+  float restart();
 
   // Returns the elapsed time in seconds.
-  float elapsed() {
-    std::chrono::milliseconds elapse =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::high_resolution_clock::now() - start_time);
-    return elapse.count() / 1000.0f;
-  }
+  float elapsed();
 
 private:
   void start() { start_time = std::chrono::high_resolution_clock::now(); }

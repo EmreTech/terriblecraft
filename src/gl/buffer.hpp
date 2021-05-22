@@ -3,7 +3,6 @@
 
 #include <glad/glad.h>
 
-#include "../utils/types.hpp"
 #include <vector>
 
 namespace gl {

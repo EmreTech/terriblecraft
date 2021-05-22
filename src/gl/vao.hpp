@@ -26,7 +26,7 @@ struct VAO {
 
     // Since all attribute data passed in will be a floating-point number, no
     // need to use glVertexAttribIPointer.
-    glVertexAttribPointer(index, size, type, FALSE, stride, (void *)offset);
+    glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void *)offset);
   }
 
   void destroy() { glDeleteVertexArrays(1, &ID); }
