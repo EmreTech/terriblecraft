@@ -3,11 +3,13 @@
 #include <iostream>
 
 #include "../../renderer/chunkRenderer.hpp"
+#include "../generation/terrainGeneration.hpp"
+#include "../world.hpp"
 
 namespace World::Chunk
 {
 
-Chunk::Chunk(const glm::vec2 &pos) : position(pos) 
+Chunk::Chunk(const glm::vec2 &pos, World &world) : position(pos), ptWorld(&world)
 {}
 
 void Chunk::makeMesh()
@@ -26,18 +28,34 @@ void Chunk::draw(Renderer::ChunkRenderer& renderer)
 {
     for (auto& layer : chunks)
     {
-        if (!layer.buffered())
-            layer.buffer();
+        if (layer.getHasMesh())
+        {
+            if (!layer.buffered())
+                layer.buffer();
 
-        if (layer.getHasMesh() && layer.buffered())
             renderer.add(layer.mesh);
+        }
     }
+}
+
+bool Chunk::hasLoaded() const noexcept
+{
+    return loaded;
+}
+
+void Chunk::load(Generation::TerrainGenerator &generator)
+{
+    if (hasLoaded())
+        return;
+
+    generator.generateTerrainFor(*this);
+    loaded = true;
 }
 
 void Chunk::addSection()
 {
     int y = chunks.size();
-    chunks.push_back(glm::vec3(position.x, y, position.y));
+    chunks.push_back( {glm::vec3(position.x, y, position.y), *ptWorld} );
 }
 
 void Chunk::addSections(int index)
@@ -80,7 +98,7 @@ Block::Block Chunk::getBlock(int x, int y, int z) const noexcept
 
 ChunkSection& Chunk::getSection(int index)
 {
-    static ChunkSection error({0, 0, 0});
+    static ChunkSection error({0, 0, 0}, *ptWorld);
 
     if (index >= (int) chunks.size() || index < 0)
         return error;

@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "chunkMeshBuilder.hpp"
+#include "../world.hpp"
 
 namespace World::Chunk {
 
@@ -11,12 +12,14 @@ ChunkSection::ChunkSection()
   position = {0, 0, 0};
 }
 
-ChunkSection::ChunkSection(const glm::vec3& pos) : position(pos) 
+ChunkSection::ChunkSection(const glm::vec3& pos, World &world) : position(pos), ptWorld(&world)
 {}
 
 void ChunkSection::setBlock(int x, int y, int z, Block::Block b) {
   if (outOfBounds(x) || outOfBounds(y) || outOfBounds(z))
   {
+    auto location = toWorldPosition(x, y, z);
+    ptWorld->setBlock(location.x, location.y, location.z, b);
     return;
   }
 
@@ -27,7 +30,8 @@ void ChunkSection::setBlock(int x, int y, int z, Block::Block b) {
 Block::Block ChunkSection::getBlock(int x, int y, int z) const {
   if (outOfBounds(x) || outOfBounds(y) || outOfBounds(z))
   {
-    return Block::BlockType::AIR;
+    auto location = toWorldPosition(x, y, z);
+    return ptWorld->getBlock(location.x, location.y, location.z);
   }
 
   return blocks.at(getIndex(x, y, z));
@@ -43,6 +47,13 @@ bool ChunkSection::getHasMesh() const
 bool ChunkSection::buffered() const
 {
   return bufferedMesh;
+}
+
+glm::vec3 ChunkSection::toWorldPosition(int x, int y, int z) const
+{
+  return {position.x * CHUNK_SIZE + x,
+          position.y * CHUNK_SIZE + y,
+          position.z * CHUNK_SIZE + z};
 }
 
 void ChunkSection::makeMesh()
@@ -65,21 +76,32 @@ void ChunkSection::buffer()
 
 const ChunkSection::Layer& ChunkSection::getLayer(int y) const
 {
-  // TODO: Properly search for the right layer in the if-else statements below
   if (y == -1)
   {
-    return layers.at(0);
+    return ptWorld->getChunk(position.x, position.z)
+      .getSection(position.y - 1)
+      .getLayer(CHUNK_SIZE - 1);
   }
 
   else if (y == CHUNK_SIZE)
   {
-    return layers.at(15);
+    return ptWorld->getChunk(position.x, position.z)
+      .getSection(position.y + 1)
+      .getLayer(0);
   }
 
   else
   {
     return layers.at(y);
   }
+}
+
+ChunkSection &ChunkSection::getAdjacent(int dx, int dz)
+{
+  int x = position.x + dx;
+  int z = position.z + dz;
+
+  return ptWorld->getChunk(x, z).getSection(position.y);
 }
 
 void ChunkSection::deleteMeshes()

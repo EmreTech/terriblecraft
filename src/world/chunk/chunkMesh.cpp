@@ -18,9 +18,13 @@ void ChunkMesh::addFace(const std::vector<float>& faceVertices,
 
     for (int i = 0, index = 0; i < 4; i++)
     {
-        mesh.vertexPositions.push_back(faceVertices[index++] + chunkPos.x * CHUNK_SIZE + blockPos.x);
-        mesh.vertexPositions.push_back(faceVertices[index++] + chunkPos.y * CHUNK_SIZE + blockPos.y);
-        mesh.vertexPositions.push_back(faceVertices[index++] + chunkPos.z * CHUNK_SIZE + blockPos.z);
+        int x = faceVertices[index++] + chunkPos.x * CHUNK_SIZE + blockPos.x;
+        int y = faceVertices[index++] + chunkPos.y * CHUNK_SIZE + blockPos.y;
+        int z = faceVertices[index++] + chunkPos.z * CHUNK_SIZE + blockPos.z;
+
+        mesh.vertexPositions.push_back(x);
+        mesh.vertexPositions.push_back(y);
+        mesh.vertexPositions.push_back(z);
     }
 
     mesh.indices.insert(mesh.indices.end(),

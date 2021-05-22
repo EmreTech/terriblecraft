@@ -14,8 +14,8 @@
 #include "utils/glm_include.hpp"
 #include "utils/perlin_noise.hpp"
 #include "utils/ray.hpp" // End of utils includes
-#include "world/chunk/chunk.hpp"
-#include "world/chunk/chunkMeshBuilder.hpp"
+#include "input/keyboard.hpp"
+#include "world/world.hpp"
 #include "world/player/camera.hpp" // End of world includes
 #include "renderer/cubeRenderer.hpp"
 #include "renderer/chunkRenderer.hpp"
@@ -24,14 +24,8 @@
 // Rewrite! Starting again with GLFW instead of SFML (like the original)
 // I didn't get much done with the original write anyways...
 
-using CompressedBlocks = std::vector<std::pair<uint16_t, uint32_t>>;
-
-// Macro to check if a key was pressed
-#define BUTTON_PRESSED(win, key) glfwGetKey(win, key) == GLFW_PRESS
-
 // Camera
-//World::Player::Camera cam(glm::vec3(8.0f, 17.0f, 8.0f));
-World::Player::Camera cam(glm::vec3(0.0f, 2.0f, 0.0f));
+World::Player::Camera cam(glm::vec3(0.0f, 0.0f, 0.0f));
 float lastX = WINDOW_WIDTH / 2.0f, lastY = WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
 
@@ -42,7 +36,7 @@ float lastFrame = 0.0f;
 // Misc
 bool cursorCaptured = true, wireframe = false;
 Clock lastWireframeToggle, lastCursorCaptureToggle;
-World::Chunk::Chunk sec({0.0f, 0.0f});
+World::World world;
 
 struct FPSCounter {
   float fps = 0;
@@ -65,36 +59,45 @@ private:
   Clock fpsTimer;
 };
 
+void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods)
+{
+  scancode += 1 - 1;
+  action += 1 - 1;
+  mods += 1 - 1;
+
+  Input::Keyboard::getInstance().update(win, key);
+}
+
 void processInput(GLFWwindow *window) {
-  if (BUTTON_PRESSED(window, GLFW_KEY_ESCAPE))
+  auto &keyboard = Input::Keyboard::getInstance();
+
+  if (keyboard.getPressedKey(GLFW_KEY_ESCAPE))
     glfwSetWindowShouldClose(window, true);
 
-  if (BUTTON_PRESSED(window, GLFW_KEY_P) &&
-      lastCursorCaptureToggle.elapsed() > 1.0f) {
+  if (keyboard.getPressedKey(GLFW_KEY_P) && lastCursorCaptureToggle.elapsed() > 1.0f) {
+    lastCursorCaptureToggle.restart();
     glfwSetInputMode(window, GLFW_CURSOR,
                      cursorCaptured ? GLFW_CURSOR_NORMAL
                                     : GLFW_CURSOR_DISABLED);
     cursorCaptured = !cursorCaptured;
-    lastCursorCaptureToggle.restart();
   }
 
-  if (BUTTON_PRESSED(window, GLFW_KEY_V) &&
-      lastWireframeToggle.elapsed() > 1.0f) {
+  if (keyboard.getPressedKey(GLFW_KEY_V) && lastWireframeToggle.elapsed() > 1.0f) {
+    lastWireframeToggle.restart();
     glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_FILL : GL_LINE);
     wireframe = !wireframe;
-    lastWireframeToggle.restart();
   }
 
-  if (BUTTON_PRESSED(window, GLFW_KEY_W) && cursorCaptured) // Forward
+  if (keyboard.getPressedKey(GLFW_KEY_W) && cursorCaptured) // Forward
     cam.Keyboard(0, deltaTime);
 
-  if (BUTTON_PRESSED(window, GLFW_KEY_S) && cursorCaptured) // Backward
+  if (keyboard.getPressedKey(GLFW_KEY_S) && cursorCaptured) // Backward
     cam.Keyboard(1, deltaTime);
 
-  if (BUTTON_PRESSED(window, GLFW_KEY_A) && cursorCaptured) // Left
+  if (keyboard.getPressedKey(GLFW_KEY_A) && cursorCaptured) // Left
     cam.Keyboard(2, deltaTime);
 
-  if (BUTTON_PRESSED(window, GLFW_KEY_D) && cursorCaptured) // Right
+  if (keyboard.getPressedKey(GLFW_KEY_D) && cursorCaptured) // Right
     cam.Keyboard(3, deltaTime);
 }
 
@@ -126,59 +129,6 @@ int heightAt(int x, int z, int chunkX, int chunkZ)
   auto generatedNoiseOne = PerlinNoise::getInstance().generateNoise( xCoord * 1.5f, zCoord * 1.5f, 0 ) * 10.0f;
   auto generatedNoiseTwo = PerlinNoise::getInstance().generateNoise( xCoord, zCoord, 0) * 5.0f;
   return generatedNoiseOne + generatedNoiseTwo;
-}
-
-CompressedBlocks compressChunk(World::Chunk::Chunk& chunk)
-{
-  CompressedBlocks output;
-  World::Block::Block currentBlock = chunk.getBlock(0, 0, 0);
-  uint32_t blockCount = 1;
-
-  for (uint32_t i = 1; i < (CHUNK_VOLUME * chunk.getAmountOfSections()); i++)
-  {
-    int x = i % CHUNK_SIZE;
-    int y = i / CHUNK_AREA;
-    int z = (i / CHUNK_SIZE) % CHUNK_SIZE;
-
-    auto block = chunk.getBlock(x, y, z);
-
-    if (block == currentBlock)
-      blockCount++;
-
-    else
-    {
-      output.emplace_back(currentBlock.id, blockCount);
-      currentBlock = block;
-      blockCount = 1;
-    }
-  }
-
-  output.emplace_back(currentBlock.id, blockCount);
-  return output;
-}
-
-World::Chunk::Chunk decompressChunk(const CompressedBlocks& blocks, const glm::vec2& pos)
-{
-  World::Chunk::Chunk output(pos);
-  int blockPointer = 0;
-
-  for (auto& block : blocks)
-  {
-    auto blockType = block.first;
-    auto count = block.second;
-
-    for (uint32_t i = 0; i < count; i++)
-    {
-      int x = blockPointer % CHUNK_SIZE;
-      int y = blockPointer / CHUNK_AREA;
-      int z = (blockPointer / CHUNK_SIZE) % CHUNK_SIZE;
-
-      output.setBlock(x, y, z, blockType);
-      blockPointer++;
-    }
-  }
-
-  return output;
 }
 
 glm::vec3 toBlockPos(const glm::vec3& vec)
@@ -223,45 +173,16 @@ int main() {
   glfwSetFramebufferSizeCallback(window, resize_window_event);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetKeyCallback(window, keyCallback);
 
   // Setup OpenGL for rendering
-  glEnable(GL_DEPTH_TEST);
-
   Renderer::SkyboxRenderer skybox;
   Renderer::ChunkRenderer chunkTest;
 
-  for (int i = 0; i < CHUNK_VOLUME * 2; i++)
-  {
-    int x = i % CHUNK_SIZE;
-    int y = i / CHUNK_AREA;
-    int z = (i / CHUNK_SIZE) % CHUNK_SIZE;
-
-    if (y <= (CHUNK_SIZE - 1))
-    {
-        sec.setBlock(x, y, z, World::Block::BlockType::DIRT);
-    }
-
-    if (y > (CHUNK_SIZE - 1))
-    {
-        int newY = heightAt(x, z, sec.getPosition().x, sec.getPosition().y);
-        float baseLandHeight = CHUNK_SIZE + 2.0f + newY;
-
-        World::Block::Block b;
-        if (y <= baseLandHeight)
-        {
-            b = World::Block::BlockType::DIRT;
-
-            if (y > baseLandHeight - 1)
-                b = World::Block::BlockType::GRASS;
-        }
-
-        sec.setBlock(x, y, z, b);
-    }
-  }
+  world.loadChunk(2, 0);
+  world.loadChunk(0, 0);
 
   FPSCounter fpsCount;
-
-  sec.makeMesh();
   Clock mDelay;
 
   // Game loop!
@@ -282,23 +203,24 @@ int main() {
     {
       auto rayBlockPos = toBlockPos(ray.getEnd());
 
-      if (true)
+      if (mDelay.elapsed() > 0.1f)
       {
-        if (mDelay.elapsed() > 0.1f)
+        mDelay.restart();
+        if (leftMouse)
         {
-          mDelay.restart();
-          if (leftMouse)
-          {
-            sec.setBlock(rayBlockPos.x, rayBlockPos.y, rayBlockPos.z, World::Block::BlockType::AIR);
-          }
+          if (world.getBlock(rayBlockPos.x, rayBlockPos.y, rayBlockPos.z) != World::Block::BlockType::AIR)
+            world.setBlock(rayBlockPos.x, rayBlockPos.y, rayBlockPos.z, World::Block::BlockType::AIR);
+        }
+        
+        if (rightMouse)
+        {
+          rayBlockPos = toBlockPos(ray.getLast());
 
-          if (rightMouse)
-          {
-            rayBlockPos = toBlockPos(ray.getLast());
-            sec.setBlock(rayBlockPos.x, rayBlockPos.y, rayBlockPos.z, World::Block::BlockType::STONE);
-          }
+          if (world.getBlock(rayBlockPos.x, rayBlockPos.y, rayBlockPos.z) == World::Block::BlockType::AIR)
+            world.setBlock(rayBlockPos.x, rayBlockPos.y, rayBlockPos.z, World::Block::BlockType::STONE);
         }
       }
+      
     }
 
     // Update the FPS count (not related to delta time calculation at all)
@@ -306,21 +228,31 @@ int main() {
     glfwSetWindowTitle(window, ("TerribleCraft - FPS: " + std::to_string(fpsCount.fps)).c_str());
 
     // BUG: Remaking meshes takes up a lot of memory
-    sec.deleteMeshes();
-    sec.makeMesh();
-    sec.draw(chunkTest);
+    world.deleteMeshes();
+
+    world.makeMesh(2, 0);
+    world.makeMesh(0, 0);
+
+    world.renderWorld(chunkTest, cam);
 
     // Render
 
     // Clear the color and depth buffer every new render frame
     glClearColor(r / 255, g / 255, b / 255, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     chunkTest.render(cam);
 
+    glDisable(GL_CULL_FACE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDepthFunc(GL_LEQUAL);
+
     skybox.render(cam);
+
     glDepthFunc(GL_LESS);
+    glPolygonMode(GL_FRONT_AND_BACK, !wireframe ? GL_FILL : GL_LINE);
 
     // GLFW: Swap buffers and poll events
     glfwSwapBuffers(window);

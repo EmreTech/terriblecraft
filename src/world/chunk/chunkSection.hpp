@@ -9,7 +9,11 @@
 #include "../block/block.hpp"
 #include "../world_constants.hpp"
 
-namespace World::Chunk {
+namespace World {
+
+struct World;
+
+namespace Chunk {
 
 struct ChunkSection {
 private:
@@ -38,7 +42,7 @@ public:
   ChunkMesh mesh;
 
   ChunkSection();
-  ChunkSection(const glm::vec3& pos);
+  ChunkSection(const glm::vec3& pos, World &world);
 
   void setBlock(int x, int y, int z, Block::Block block);
   Block::Block getBlock(int x, int y, int z) const;
@@ -49,6 +53,7 @@ public:
   bool buffered() const;
 
   const Layer& getLayer(int y) const;
+  ChunkSection &getAdjacent(int dx, int dz);
 
   void makeMesh();
   void buffer();
@@ -56,6 +61,8 @@ public:
   void deleteMeshes();
 
 private:
+  glm::vec3 toWorldPosition(int x, int y, int z) const;
+
   static bool outOfBounds(int val);
   int getIndex(int x, int y, int z) const;
 
@@ -63,9 +70,13 @@ private:
   std::array<Layer, CHUNK_SIZE> layers;
 
   glm::vec3 position;
+
+  World *ptWorld = nullptr;
   bool hasMesh, bufferedMesh = false;
 };
 
-} // namespace World::Chunk
+} // namespace Chunk
+
+} // namespace World
 
 #endif

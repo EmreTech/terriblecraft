@@ -14,15 +14,27 @@ namespace Renderer
 } // namespace Renderer
 
 
-namespace World::Chunk {
+namespace World {
+
+struct World;
+
+namespace Generation
+{
+  struct TerrainGenerator;
+} // namespace Generation
+
+namespace Chunk {
 
 struct Chunk {
   Chunk() = default;
-  Chunk(const glm::vec2 &pos);
+  Chunk(const glm::vec2 &pos, World &world);
 
   void makeMesh();
   void deleteMeshes();
   void draw(Renderer::ChunkRenderer& renderer);
+
+  bool hasLoaded() const noexcept;
+  void load(Generation::TerrainGenerator& generator);
 
   void addSection();
   void addSections(int index);
@@ -37,6 +49,8 @@ struct Chunk {
   const glm::vec2 &getPosition() const;
   size_t getAmountOfSections() const;
 
+  void generate();
+
 private:
   bool yOutOfBound(int y) const noexcept;
   bool xzOutOfBound(int x, int z) const noexcept;
@@ -45,9 +59,12 @@ private:
   std::vector<ChunkSection> chunks;
   glm::vec2 position;
   
-  //bool generated = false;
+  World *ptWorld = nullptr;
+  bool loaded = false;
 };
 
-} // namespace World::Chunk
+} // namespace Chunk
+
+} // namespace World
 
 #endif

@@ -6,7 +6,7 @@
 #include "gl/buffer.hpp"
 #include "renderer/renderInfo.hpp"
 
-struct Model : public NonCopyable
+struct Model //: public NonCopyable
 {
     Model() = default;
     Model(const Mesh& mesh);
@@ -15,10 +15,15 @@ struct Model : public NonCopyable
     Model(Model &&other);
     Model &operator=(Model &&other);
 
-    void addMeshData(const Mesh& mesh);
+    Model(const Model& other);
+    Model &operator=(const Model& other);
+
+    void addMeshData(const Mesh& mesh, bool indices = true);
     void deleteData();
 
     void addVBO(int dimensions, const std::vector<float>& data);
+    void addEBO(const std::vector<unsigned int>& indices);
+
     void bindVAO() const
     {
         renderInfo.vao.bind();
@@ -29,8 +34,6 @@ struct Model : public NonCopyable
 
     private:
     RenderInfo renderInfo;
-
-    void addEBO(const std::vector<unsigned int>& indices);
 
     int vboCount = 0;
     std::vector<gl::Buffer> buffers;

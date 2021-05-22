@@ -134,7 +134,7 @@ void ChunkMeshBuilder::addFace(const std::vector<float>& blockFace,
     if (makeFace(blockFacing))
     {
         faces++;
-        auto texCoords = World::Block::GetTextureCoords(textureCoords.x, textureCoords.y);
+        auto texCoords = Block::GetTextureCoords(textureCoords.x, textureCoords.y);
 
         pMesh->addFace(blockFace, texCoords, pChunk->getPosition(), blockPos);
     }
@@ -156,9 +156,17 @@ bool ChunkMeshBuilder::makeFace(const glm::vec3& blockPos)
 
 bool ChunkMeshBuilder::makeLayer(int y)
 {
+    auto adjIsSolid = [&](int dx, int dz) {
+        const ChunkSection &sect = pChunk->getAdjacent(dx, dz);
+        return sect.getLayer(y).isAllSolid();
+    };
+
     return (!pChunk->getLayer(y).isAllSolid()) ||
-            (!pChunk->getLayer(y + 1).isAllSolid()) ||
-            (!pChunk->getLayer(y - 1).isAllSolid());
+           (!pChunk->getLayer(y + 1).isAllSolid()) ||
+           (!pChunk->getLayer(y - 1).isAllSolid()) ||
+
+           (!adjIsSolid(1, 0)) || (!adjIsSolid(0, 1)) || (!adjIsSolid(-1, 0)) ||
+           (!adjIsSolid(0, -1));
 }
 
 } // namespace World::Chunk

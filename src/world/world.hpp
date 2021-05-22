@@ -3,9 +3,9 @@
 
 #include <vector>
 #include <map>
-#include <unordered_map>
 
 #include "chunk/chunk.hpp"
+#include "generation/terrainGeneration.hpp"
 #include "player/camera.hpp"
 #include "../renderer/chunkRenderer.hpp"
 
@@ -31,7 +31,7 @@ CompressedBlocks compressChunk(Chunk::Chunk& chunk);
  * 
  * @return A decompressed Chunk
  */
-Chunk::Chunk decompressChunk(const CompressedBlocks& blocks, const glm::vec2& pos);
+Chunk::Chunk decompressChunk(const CompressedBlocks& blocks, const glm::vec2& pos, World &world);
 
 struct World
 {
@@ -56,7 +56,8 @@ struct World
     void update();
     void updateChunk(int bX, int bY, int bZ);
 
-    bool makeMesh(int x, int z, const Player::Camera& cam);
+    void makeMesh(int x, int z);
+    void buffer(int x, int z);
     void deleteMeshes();
 
     void renderWorld(Renderer::ChunkRenderer &renderer, const Player::Camera &cam);
@@ -70,7 +71,9 @@ struct World
     ChunkMap loadedChunks;
     CompressedChunkMap unloadedChunks;
 
-    std::unordered_map<glm::vec3, Chunk::ChunkSection*> chunkUpdates;
+    std::vector<glm::vec3> chunkUpdates;
+
+    Generation::TerrainGenerator generator;
 
     bool isRunning = true;
 

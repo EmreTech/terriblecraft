@@ -33,7 +33,22 @@ Model &Model::operator=(Model &&other)
     return *this;
 }
 
-void Model::addMeshData(const Mesh& mesh)
+Model::Model(const Model& other) :
+    renderInfo(other.renderInfo),
+    vboCount(other.vboCount),
+    buffers(other.buffers)
+{}
+
+Model &Model::operator=(const Model& other)
+{
+    renderInfo = other.renderInfo;
+    vboCount = other.vboCount;
+    buffers = other.buffers;
+
+    return *this;
+}
+
+void Model::addMeshData(const Mesh& mesh, bool indices)
 {
     if (renderInfo.vao.ID != 0)
         deleteData();
@@ -43,7 +58,9 @@ void Model::addMeshData(const Mesh& mesh)
 
     addVBO(3, mesh.vertexPositions);
     addVBO(2, mesh.textureCoords);
-    addEBO(mesh.indices);    
+
+    if (indices)
+        addEBO(mesh.indices);  
 }
 
 void Model::addVBO(int dimensions, const std::vector<float>& data)

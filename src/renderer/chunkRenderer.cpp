@@ -19,10 +19,10 @@ void ChunkRenderer::add(const World::Chunk::ChunkMesh& mesh)
 
 void ChunkRenderer::render(const World::Player::Camera& cam)
 {
+    // TODO: Pack vertex and texture coordinates before sending them to the shader. The shader will unpack it when it runs.
+
     if (chunks.empty())
         return;
-
-    glEnable(GL_CULL_FACE);
 
     shader.activate();
     atlasTexture.bind();

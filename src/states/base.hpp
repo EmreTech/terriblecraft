@@ -9,6 +9,7 @@ struct StateBase
     virtual ~StateBase() = 0;
 
     virtual void handleInput() = 0;
+    virtual void mouseInput(double x, double y) = 0;
 
     virtual void update(float dt) = 0;
     virtual void render() = 0;

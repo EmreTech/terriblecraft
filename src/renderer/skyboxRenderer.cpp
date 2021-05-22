@@ -92,12 +92,12 @@ SkyboxRenderer::SkyboxRenderer()
 
     std::vector<std::string> faces
     {
-        "res/images/skybox/right.jpg",
-        "res/images/skybox/left.jpg",
-        "res/images/skybox/top.jpg",
-        "res/images/skybox/bottom.jpg",
-        "res/images/skybox/front.jpg",
-        "res/images/skybox/back.jpg"
+        "res/images/skybox/side.png"  , // Right
+        "res/images/skybox/side.png"  , // Left
+        "res/images/skybox/top.png"   , // Top
+        "res/images/skybox/bottom.png", // Bottom
+        "res/images/skybox/side.png"  , // Front
+        "res/images/skybox/side.png"  , // Back
     };
 
     cubemapID = loadCubemap(faces);
