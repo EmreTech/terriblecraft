@@ -11,6 +11,9 @@ bool loadGL()
         return false;
     }
 
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glEnable(GL_DEPTH_TEST);
+
     return true;
 }
 
@@ -28,12 +31,10 @@ void Window::create()
     settings.attributeFlags = sf::ContextSettings::Core;
 
     window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "TerribleCraft", sf::Style::Default, settings);
-    window.setActive(true);
+    window.setPosition({window.getPosition().x, 0});
 
     if (!loadGL())
         exit(1);
-    
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 sf::Window& Window::getWindow()

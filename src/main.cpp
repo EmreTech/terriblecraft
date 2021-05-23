@@ -51,6 +51,8 @@ void handleEvents(bool &running)
 int main()
 {
     window.create();
+    window.getWindow().setActive();
+
     Renderer::RenderMaster master;
     
     states.push_back(std::make_unique<States::PlayingState>(cam, window));
@@ -79,7 +81,7 @@ int main()
 
         currentState.render(master);
         glClearColor(r / 255, g / 255, b / 255, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // BUG: Camera approach is somehow not rendering the quad?
         master.finishRender(cam);

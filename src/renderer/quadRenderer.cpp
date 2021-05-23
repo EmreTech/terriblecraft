@@ -1,6 +1,7 @@
 #include "quadRenderer.hpp"
 
 #include "../camera.hpp"
+#include "../utils/constants.hpp"
 
 namespace Renderer
 {
@@ -61,7 +62,7 @@ void QuadRenderer::render(const Camera &cam)
 
     for (auto &position : quadPos)
     {
-        glm::mat4 model;
+        glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, position);
         shader.uniformMatrix4("model", model);
 

@@ -4,38 +4,29 @@
 
 Camera::Camera()
 {
-    setProjType(ProjectionType::PERSPECTIVE);
+    projectionMatrix = glm::perspective(glm::radians(90.0f), (float) (WINDOW_WIDTH / WINDOW_HEIGHT), 0.1f, 1000.0f);
     position = {0.0f, 0.0f, 0.0f};
-}
-
-void Camera::setProjType(const ProjectionType &newType)
-{
-    type = newType;
-
-    switch (type)
-    {
-        case ProjectionType::PERSPECTIVE:
-        projectionMatrix = glm::perspective(glm::radians(90.0f), (float) (WINDOW_WIDTH / WINDOW_HEIGHT), 0.1f, 1000.0f);
-        break;
-
-        case ProjectionType::ORTHOGRAPHIC:
-        projectionMatrix = glm::ortho(0.0f, (float) WINDOW_WIDTH, 0.0f, (float) WINDOW_HEIGHT, 0.1f, 1000.0f);
-        break;
-    }
 }
 
 void Camera::makeViewMatrix()
 {
-    viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.x), {1, 0, 0});
-    viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.y), {0, 1, 0});
-    viewMatrix = glm::rotate(viewMatrix, glm::radians(rotation.z), {0, 0, 1});
-    viewMatrix = glm::translate(viewMatrix, position);
+    viewMatrix = glm::lookAt(position, position + Front, Up);
 }
 
 void Camera::update()
 {
+    // Update the camera's position and rotation to be linked to the entity's one
     position = ptEntity->position;
     rotation = ptEntity->rotation;
+
+    // Recalculate the vectors every time we move
+    glm::vec3 front;
+    front.x = cos(glm::radians(rotation.x)) * cos(glm::radians(rotation.y));
+    front.y = sin(glm::radians(rotation.y));
+    front.z = sin(glm::radians(rotation.x)) * cos(glm::radians(rotation.y));
+    Front = glm::normalize(front);
+    Right = glm::normalize(glm::cross(Front, WorldUp));
+    Up = glm::normalize(glm::cross(Right, Front));
 
     makeViewMatrix();
 }

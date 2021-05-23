@@ -22,6 +22,7 @@ struct PlayingState : public BaseState
 
     private:
     Player::Player player{ {0.0f, 0.0f, 0.0f} };
+    Camera *ptCamera = nullptr;
     Window *ptWindow = nullptr;
 };
 

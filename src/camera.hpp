@@ -4,17 +4,15 @@
 #include "utils/glm_include.hpp"
 #include "entity/entity.hpp"
 
-enum class ProjectionType
-{
-    PERSPECTIVE,
-    ORTHOGRAPHIC
-};
-
 struct Camera : public Entity
 {
+    glm::vec3 Front{0.0f, 0.0f, -1.0f};
+    glm::vec3 Up{0.0f, 1.0f, 0.0f};
+    glm::vec3 Right;
+    glm::vec3 WorldUp{0.0f, 1.0f, 0.0f};
+
     Camera();
 
-    void setProjType(const ProjectionType &newType);
     void update();
 
     void hookEntity(Entity &entity);
@@ -28,10 +26,8 @@ struct Camera : public Entity
 
     Entity *ptEntity = nullptr;
 
-    glm::mat4 projectionMatrix;
-    glm::mat4 viewMatrix;
-
-    ProjectionType type;
+    glm::mat4 projectionMatrix{1.0f};
+    glm::mat4 viewMatrix{1.0f};
 };
 
 #endif

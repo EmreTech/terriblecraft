@@ -5,9 +5,9 @@
 namespace States
 {
 
-PlayingState::PlayingState(Camera &cam, Window &window) : ptWindow(&window)
+PlayingState::PlayingState(Camera &cam, Window &window) : ptCamera(&cam), ptWindow(&window)
 {
-    cam.hookEntity(player);
+    ptCamera->hookEntity(player);
 }
 
 void PlayingState::handleInput()
@@ -25,7 +25,16 @@ void PlayingState::update(float deltaTime)
 
 void PlayingState::render(Renderer::RenderMaster &renderer)
 {
-    renderer.drawQuad({0.0f, 0.0f, 2.0f});
+    glm::vec3 camPos;
+    //camPos = ptCamera->position;
+    camPos.z += 2.0f;
+    renderer.drawQuad(camPos);
+
+    camPos.x += 2.0f;
+    renderer.drawQuad(camPos);
+
+    camPos.x -= 4.0f;
+    renderer.drawQuad(camPos);
 }
 
 } // namespace States
