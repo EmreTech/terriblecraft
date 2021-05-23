@@ -1,5 +1,7 @@
 #include "quadRenderer.hpp"
 
+#include "../camera.hpp"
+
 namespace Renderer
 {
 
@@ -41,11 +43,32 @@ QuadRenderer::~QuadRenderer()
     vao.destroy();
 }
 
-void QuadRenderer::render()
+void QuadRenderer::add(const glm::vec3 &position)
+{
+    quadPos.push_back(position);
+}
+
+void QuadRenderer::render(const Camera &cam)
 {
     shader.activate();
     vao.bind();
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    
+    auto projection = cam.ProjMatrix();
+    auto view = cam.ViewMatrix();
+
+    shader.uniformMatrix4("projection", projection);
+    shader.uniformMatrix4("view", view);
+
+    for (auto &position : quadPos)
+    {
+        glm::mat4 model;
+        model = glm::translate(model, position);
+        shader.uniformMatrix4("model", model);
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    }
+
+    quadPos.clear();
 }
 
 } // namespace Renderer

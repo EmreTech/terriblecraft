@@ -2,23 +2,27 @@
 #define PLAYING_STATE_HPP
 
 #include "stateBase.hpp"
-#include "../renderer/quadRenderer.hpp"
+#include "../utils/glm_include.hpp"
+#include "../renderer/renderMaster.hpp"
+#include "../entity/player/player.hpp"
+#include "../window.hpp"
 
 namespace States
 {
 
 struct PlayingState : public BaseState
 {
-    PlayingState();
+    PlayingState(Camera &cam, Window &window);
 
-    void handleInput(sf::Keyboard::Key key) override;
+    void handleInput() override;
     void handleEvents(sf::Event event) override;
 
     void update(float deltaTime) override;
-    void render() override;
+    void render(Renderer::RenderMaster &renderer) override;
 
     private:
-    Renderer::QuadRenderer renderer;
+    Player::Player player{ {0.0f, 0.0f, 0.0f} };
+    Window *ptWindow = nullptr;
 };
 
 } // namespace States
