@@ -8,6 +8,7 @@
 #include "../gl/shader.hpp"
 #include "../gl/buffer.hpp"
 #include "../gl/vao.hpp"
+#include "../gl/texture.hpp"
 
 struct Camera;
 
@@ -30,6 +31,8 @@ struct QuadRenderer
     gl::Buffer vbo;
     gl::Buffer ebo;
     gl::VAO vao;
+
+    gl::Texture texture;
 };
 
 } // namespace Renderer

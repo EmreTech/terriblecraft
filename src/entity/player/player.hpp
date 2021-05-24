@@ -5,6 +5,7 @@
 
 #include "../entity.hpp"
 #include "../../utils/constants.hpp"
+#include "../../camera.hpp"
 
 namespace Player
 {
@@ -25,9 +26,7 @@ struct Player : public Entity
 
     glm::vec3 velocity;
 
-    float lastX = WINDOW_WIDTH / 2;
-    float lastY = WINDOW_HEIGHT / 2;
-    bool firstMouse = true;
+    sf::Vector2i lastMousePosition;
 };
 
 } // namespace Player

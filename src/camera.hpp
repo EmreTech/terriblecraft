@@ -4,12 +4,10 @@
 #include "utils/glm_include.hpp"
 #include "entity/entity.hpp"
 
-struct Camera : public Entity
+struct Camera
 {
-    glm::vec3 Front{0.0f, 0.0f, -1.0f};
-    glm::vec3 Up{0.0f, 1.0f, 0.0f};
-    glm::vec3 Right;
-    glm::vec3 WorldUp{0.0f, 1.0f, 0.0f};
+    glm::vec3 position;
+    glm::vec3 rotation;
 
     Camera();
 
@@ -22,8 +20,6 @@ struct Camera : public Entity
     const glm::mat4& ProjMatrix() const;
 
     private:
-    void makeViewMatrix();
-
     Entity *ptEntity = nullptr;
 
     glm::mat4 projectionMatrix{1.0f};
