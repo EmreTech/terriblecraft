@@ -26,7 +26,8 @@ void Player::update(float deltaTime)
     velocity.z *= 0.75f;
 
     //position.z = 0.0f;
-    std::cout << "Position: X: " << position.x << " Y: " << position.y << " Z: " << position.z << '\n';
+    //std::cout << "Position: X: " << position.x << " Y: " << position.y << " Z: " << position.z << '\n';
+    //std::cout << "Yaw: " << rotation.y << " Pitch: " << rotation.x << '\n';
 }
 
 void Player::keyboard()
@@ -68,41 +69,35 @@ void Player::keyboard()
     }
 
     velocity += change;
+
+    if (rotation.x > 85.0f)
+    {
+        rotation.x = 84.9f;
+    }
+    else if (rotation.x < -80.0f)
+    {
+        rotation.x = -79.9f;
+    }
 }
 
 void Player::mouse(const sf::Window &window)
 {
-    // TODO: Ensure the mouse movement doesn't have any weird effects
-
-    const float BOUND = 89.0f;
     auto mouseChange = sf::Mouse::getPosition(window) - lastMousePosition;
 
-    rotation.x += mouseChange.y * sensitivity;
-    rotation.y += mouseChange.x * sensitivity;
+    rotation.x += static_cast<float>(mouseChange.y / 8.0f * sensitivity); // Pitch
+    rotation.y += static_cast<float>(mouseChange.x / 8.0f * sensitivity); // Yaw
 
-    if (rotation.x > BOUND)
-    {
-        rotation.x = BOUND;
-    }
-    else if (rotation.x < -BOUND)
-    {
-        rotation.x = -BOUND;
-    }
+    auto cx = static_cast<int>(window.getSize().x) / 2;
+    auto cy = static_cast<int>(window.getSize().y) / 2;
+    sf::Mouse::setPosition({cx, cy}, window);
 
-    if (rotation.y < 0)
-    {
-        rotation.y = 360;
-    }
-    else if (rotation.y > 360)
-    {
-        rotation.y = 0;
-    }
-
-    //auto cx = static_cast<int>(window.getSize().x) / 4;
-    //auto cy = static_cast<int>(window.getSize().y) / 4;
-    //sf::Mouse::setPosition({cx, cy}, window);
-
+// Fixes camera jittering on macOS (solution from open-builder)
+#ifndef __APPLE__
     lastMousePosition = sf::Mouse::getPosition(window);
+#else
+    lastMousePosition.x = (int) window.getSize().x / 2;
+    lastMousePosition.y = (int) window.getSize().y / 2;
+#endif
 }
 
 } // namespace Player

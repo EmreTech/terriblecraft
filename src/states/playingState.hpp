@@ -12,7 +12,7 @@ namespace States
 
 struct PlayingState : public BaseState
 {
-    PlayingState(Camera &cam, Window &window);
+    PlayingState(Camera &cam);
 
     void handleInput() override;
     void handleEvents(sf::Event event) override;
@@ -23,7 +23,6 @@ struct PlayingState : public BaseState
     private:
     Player::Player player{ {0.0f, 0.0f, 0.0f} };
     Camera *ptCamera = nullptr;
-    Window *ptWindow = nullptr;
 };
 
 } // namespace States

@@ -5,14 +5,14 @@
 namespace States
 {
 
-PlayingState::PlayingState(Camera &cam, Window &window) : ptCamera(&cam), ptWindow(&window)
+PlayingState::PlayingState(Camera &cam) : ptCamera(&cam)
 {
     ptCamera->hookEntity(player);
 }
 
 void PlayingState::handleInput()
 {
-    player.handleInput(ptWindow->getWindow());
+    player.handleInput(Window::get());
 }
 
 void PlayingState::handleEvents(sf::Event event)

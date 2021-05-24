@@ -1,5 +1,7 @@
 #include "window.hpp"
 
+#include <memory>
+
 namespace
 {
 
@@ -19,8 +21,12 @@ bool loadGL()
 
 } // namespace
 
+namespace Window
+{
 
-void Window::create()
+std::unique_ptr<sf::Window> window_ptr;
+
+void create()
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 0;
@@ -30,14 +36,22 @@ void Window::create()
     settings.stencilBits = 8;
     settings.attributeFlags = sf::ContextSettings::Core;
 
-    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "TerribleCraft", sf::Style::Default, settings);
-    window.setPosition({window.getPosition().x, 0});
+    window_ptr = std::make_unique<sf::Window>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), 
+                                              "TerribleCraft", 
+                                              sf::Style::Close, 
+                                              settings);
+    window_ptr->setKeyRepeatEnabled(false);
+    window_ptr->setMouseCursorVisible(false);
 
     if (!loadGL())
         exit(1);
 }
 
-sf::Window& Window::getWindow()
+sf::Window& get()
 {
-    return window;
+    return *window_ptr;
 }
+
+
+
+} // namespace Window

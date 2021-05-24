@@ -4,6 +4,8 @@
 #include "utils/glm_include.hpp"
 #include "entity/entity.hpp"
 
+// TODO: Fix weird movements when the camera is near quads
+
 struct Camera
 {
     glm::vec3 position;

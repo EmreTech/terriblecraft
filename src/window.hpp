@@ -8,15 +8,13 @@
 
 #include "utils/constants.hpp"
 
-struct Window
+namespace Window
 {
-    Window() = default;
 
-    void create();
-    sf::Window& getWindow();
+void create();
+sf::Window &get();
 
-    private:
-    sf::Window window;
-};
+} // namespace Window
+
 
 #endif

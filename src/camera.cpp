@@ -5,8 +5,8 @@
 
 Camera::Camera()
 {
-    projectionMatrix = glm::perspective(glm::radians(90.0f), (float) (WINDOW_WIDTH / WINDOW_HEIGHT), 0.1f, 1000.0f);
-    position = {0.0f, 0.0f, 0.0f};
+    float aspect = (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT;
+    projectionMatrix = glm::perspective(3.14f / 2.0f, aspect, 0.1f, 1000.0f);
 }
 
 void Camera::update()

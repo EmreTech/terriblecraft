@@ -19,12 +19,12 @@ struct Player : public Entity
 
     private:
     const float speed = 0.5f;
-    const float sensitivity = 0.1f;
+    const float sensitivity = 1.f;
 
     void keyboard();
     void mouse(const sf::Window &window);
 
-    glm::vec3 velocity;
+    glm::vec3 velocity{0.0f};
 
     sf::Vector2i lastMousePosition;
 };
