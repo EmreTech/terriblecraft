@@ -6,8 +6,6 @@
 #include "../../utils/glm_include.hpp"
 #include "../entity.hpp"
 
-struct Camera;
-
 namespace Player
 {
 

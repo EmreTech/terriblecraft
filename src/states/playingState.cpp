@@ -25,16 +25,7 @@ void PlayingState::update(float deltaTime)
 
 void PlayingState::render(Renderer::RenderMaster &renderer)
 {
-    glm::vec3 camPos;
-    //camPos = ptCamera->position;
-    camPos.z += 2.0f;
-    renderer.drawQuad(camPos);
-
-    camPos.x += 2.0f;
-    renderer.drawQuad(camPos);
-
-    camPos.x -= 4.0f;
-    renderer.drawQuad(camPos);
+    renderer.drawCube({0.0f, -0.5f, 3.0f});
 }
 
 } // namespace States

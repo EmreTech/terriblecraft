@@ -2,8 +2,6 @@
 - Add modding support by moving certain hardcoded parts of code to Lua (for example, moving defining block types to Lua code)
 
 # Camera
-- Fix bug where if you are near a quad and you move the camera via the mouse, the camera moves and rotates weirdly
-- Update the projection matrix if the window changes size
 - Add the option for the camera to be independently controlled
 
 # Player
@@ -16,7 +14,7 @@
 - Store both loaded and unloaded chunks in seperate maps
 - Compress chunks before unloading them, then decompress the compressed chunk before reloading (to save memory)
 ## Chunks
-- Chunk Section class, which manages all blocks in one chunk section (16 * 16 * 8).
+- Chunk Section class, which manages all blocks in one chunk section (16 * 16 * 16).
 - Chunk class, which manages all chunk sections of a single chunk.
 - Build an optimized chunk mesh where if a solid block is facing an air block or liquid block (for example, water), we build a face at that direction. Otherwise, we don't build a face.
 - Split chunk meshes into the solid mesh, liquid mesh, and flora (plant) mesh. This will allow for certain meshes to be rendered differently 
@@ -26,6 +24,7 @@
 - Main menu
 - Pause menu
 - Add a HUD (crosshair, inventory, stats about the game when enabled)
+- Allow Lua to create/control the UI
 
 # Also
 - Any comments in the code that starts with TODO, FIXME, or BUG.

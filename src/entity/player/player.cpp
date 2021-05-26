@@ -10,7 +10,7 @@ namespace Player
 Player::Player(const glm::vec3 &startPos)
 {
     position = startPos;
-    rotation.y = 90.0f;
+    velocity = {0.0f, 0.0f, 0.0f};
 
     input.linkEntity(*this);
 }
@@ -28,56 +28,20 @@ void Player::update(float deltaTime)
     velocity.x *= 0.75f;
     velocity.z *= 0.75f;
 
-    position.y = 0.0f;
-
     std::cout << "Position: X: " << position.x << " Y: " << position.y << " Z: " << position.z << '\n';
 }
 
 void Player::keyboard()
 {
-    /*
-    float yaw90 = glm::radians(rotation.y + 90);
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-    {
-        acceleration.x += -glm::cos(yaw90) * speed;
-        acceleration.z += -glm::sin(yaw90) * speed;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-    {
-        acceleration.x += glm::cos(yaw90) * speed;
-        acceleration.z += glm::sin(yaw90) * speed;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-    {
-        acceleration += leftVector(rotation) * speed;
-
-        // This is to ensure the acceleration vector is actually going left
- 
-        acceleration.x += -glm::cos(yaw90) * speed;
-        acceleration.z += -glm::sin(yaw90) * speed;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-    {
-        acceleration += rightVector(rotation) * speed;
-
-        // This is to ensure the acceleration vector is actually going right
-
-        acceleration.x += glm::cos(yaw90) * speed;
-        acceleration.z += glm::sin(yaw90) * speed;
-    }
-    */
-
     float currentSpeed = speed;
 
-    PlayerMovement movement;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-    {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-            currentSpeed *= 10.0f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+        currentSpeed *= 20.0f;
 
+    PlayerMovement movement;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         movement = PlayerMovement::FORWARD;
-    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         movement = PlayerMovement::BACKWARD;
@@ -87,6 +51,7 @@ void Player::keyboard()
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         movement = PlayerMovement::RIGHT;
+    
 
     input.keyboardInput(movement, currentSpeed);
 }
