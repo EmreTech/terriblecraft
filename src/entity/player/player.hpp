@@ -6,9 +6,12 @@
 #include "../entity.hpp"
 #include "../../utils/constants.hpp"
 #include "../../camera.hpp"
+#include "playerInput.hpp"
 
 namespace Player
 {
+
+struct PlayerInput;
 
 struct Player : public Entity
 {
@@ -24,7 +27,7 @@ struct Player : public Entity
     void keyboard();
     void mouse(const sf::Window &window);
 
-    glm::vec3 velocity{0.0f};
+    PlayerInput input;
 
     sf::Vector2i lastMousePosition;
 };

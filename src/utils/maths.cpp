@@ -1,13 +1,10 @@
 #include "maths.hpp"
 
-glm::mat4 createViewMatrix(const glm::vec3 &position, const glm::vec3 &rotation)
+#include "../camera.hpp"
+
+glm::mat4 createViewMatrix(Camera &camera)
 {
-    glm::mat4 view{1.0f};
-
-    rotateMatrix(view, rotation);
-    translateMatrix(view, -position);
-
-    return view;
+    return glm::lookAt(camera.position, camera.position + camera.Front, camera.Up);
 }
 
 void rotateMatrix(glm::mat4 &matrix, const glm::vec3 &degrees)

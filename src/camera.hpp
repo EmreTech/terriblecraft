@@ -2,16 +2,21 @@
 #define CAMERA_HPP
 
 #include "utils/glm_include.hpp"
+#include "utils/constants.hpp"
 #include "entity/entity.hpp"
-
-// TODO: Fix weird movements when the camera is near quads
 
 struct Camera
 {
-    glm::vec3 position;
-    glm::vec3 rotation;
+    glm::vec3 position{0.0f};
+    glm::vec3 Front;
+    glm::vec3 Up;
+    glm::vec3 Right;
+    glm::vec3 WorldUp;
+
+    glm::vec3 rotation{0.0f};
 
     Camera();
+    ~Camera();
 
     void update();
 
@@ -22,6 +27,8 @@ struct Camera
     const glm::mat4& ProjMatrix() const;
 
     private:
+    void updateVectors();
+
     Entity *ptEntity = nullptr;
 
     glm::mat4 projectionMatrix{1.0f};

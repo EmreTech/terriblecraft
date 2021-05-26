@@ -40,7 +40,7 @@ QuadRenderer::QuadRenderer()
     vao.attribute(vbo, 1, 2, GL_FLOAT, 5 * sizeof(float), 3 * sizeof(float));
     glEnableVertexAttribArray(1);
 
-    texture.init("res/images/container.jpg", GL_RGB, STBI_rgb);
+    texture.init("res/images/awesomeface.png", GL_RGBA, STBI_rgb_alpha);
 }
 
 QuadRenderer::~QuadRenderer()

@@ -17,7 +17,7 @@ void Texture::init(const std::string &filepath, GLint typeOfImage,
   // Load and generate the texture
   int nrChannels;
 
-  stbi_set_flip_vertically_on_load(true);
+  stbi_set_flip_vertically_on_load(false);
 
   unsigned char *data =
       stbi_load(filepath.c_str(), &width, &height, &nrChannels, stbi_load_as);
