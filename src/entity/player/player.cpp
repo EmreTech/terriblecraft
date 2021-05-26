@@ -9,8 +9,8 @@ namespace Player
 
 Player::Player(const glm::vec3 &startPos)
 {
-    position = startPos;
-    velocity = {0.0f, 0.0f, 0.0f};
+    position   = startPos;
+    velocity   = {0.0f, 0.0f, 0.0f};
 
     input.linkEntity(*this);
 }
@@ -26,9 +26,8 @@ void Player::update(float deltaTime)
     position += velocity * deltaTime;
 
     velocity.x *= 0.75f;
+    velocity.y *= 0.75f;
     velocity.z *= 0.75f;
-
-    std::cout << "Position: X: " << position.x << " Y: " << position.y << " Z: " << position.z << '\n';
 }
 
 void Player::keyboard()
@@ -51,9 +50,14 @@ void Player::keyboard()
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         movement = PlayerMovement::RIGHT;
-    
 
     input.keyboardInput(movement, currentSpeed);
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        velocity.y += currentSpeed;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+        velocity.y -= currentSpeed;
 }
 
 void Player::mouse(const sf::Window &window)

@@ -12,40 +12,40 @@ CubeRenderer::CubeRenderer()
 
     float vertices[] = {
         // Back
-        0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-        1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 
-        1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 
-        0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.8f,
+        1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.8f, 
+        1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.8f, 
+        0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.8f,
 
         // Right
-        1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 
-        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 
-        1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 
-        1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.6f,
+        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.6f,
+        1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.6f,
+        1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.6f,
 
         // Front
-        1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.8f,
+        0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.8f,
+        0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.8f,
+        1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.8f, 
 
         // Left
-        0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 
-        0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 
-        0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.6f,
+        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.6f,
+        0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.6f,
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.6f,
 
         // Top
-        1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 
-        0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 
-        1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 
         // Bottom
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.4f,
+        1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.4f,
+        1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.4f,
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.4f,
     };
 
     unsigned int indices[] = {
@@ -79,13 +79,18 @@ CubeRenderer::CubeRenderer()
     ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
     ebo.bufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices);
 
-    vao.attribute(vbo, 0, 3, GL_FLOAT, 5 * sizeof(float), 0);
+    vao.attribute(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
 
-    vao.attribute(vbo, 1, 2, GL_FLOAT, 5 * sizeof(float), 3 * sizeof(float));
+    vao.attribute(vbo, 1, 2, GL_FLOAT, 6 * sizeof(float), 3 * sizeof(float));
     glEnableVertexAttribArray(1);
 
+    vao.attribute(vbo, 2, 1, GL_FLOAT, 6 * sizeof(float), 5 * sizeof(float));
+    glEnableVertexAttribArray(2);
+
     texture.init("res/images/blocks/grass_side.png", GL_RGBA, STBI_rgb_alpha);
+
+    std::cout << glGetError() << '\n';
 }
 
 CubeRenderer::~CubeRenderer()

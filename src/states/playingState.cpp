@@ -25,7 +25,7 @@ void PlayingState::update(float deltaTime)
 
 void PlayingState::render(Renderer::RenderMaster &renderer)
 {
-    renderer.drawCube({0.0f, -0.5f, 3.0f});
+    renderer.drawCube({0.0f, 0.0f, 3.0f});
 }
 
 } // namespace States

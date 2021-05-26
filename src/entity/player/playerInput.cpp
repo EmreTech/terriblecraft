@@ -78,7 +78,7 @@ void PlayerInput::mouseInput(sf::Vector2i change, float sensitivity)
     else if (pitch < -89.0f)
         pitch = -89.0f;
 
-    if (yaw > 359.0f)
+    if (yaw > 360.0f)
         yaw = 0.0f;
 
     else if (yaw < 0)

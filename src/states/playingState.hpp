@@ -21,7 +21,7 @@ struct PlayingState : public BaseState
     void render(Renderer::RenderMaster &renderer) override;
 
     private:
-    Player::Player player{ {0.0f, 0.0f, 0.0f} };
+    Player::Player player{ {0.0f, 2.0f, 3.0f} };
     Camera *ptCamera = nullptr;
 };
 

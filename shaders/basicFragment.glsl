@@ -2,12 +2,13 @@
 out vec4 FragColor;
 
 in vec2 TexCoord;
+in float Light;
 
 uniform sampler2D texture1;
 
 void main()
 {
-    FragColor = texture(texture1, TexCoord);
+    FragColor = Light * texture(texture1, TexCoord);
 
     if (FragColor.a == 0)
     {

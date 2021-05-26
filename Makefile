@@ -15,13 +15,14 @@ LIBS := sfml-graphics
 # General compiler flags
 COMPILE_FLAGS := -std=c++17 -Wall -Wextra -g
 # Add additional include paths
-INCLUDES := -I src -I src/libs/glad/include -I src/libs/glm/include -I src/libs/stb_image
+INCLUDES := -I src -I src/libs -I src/libs/glad/include -I src/libs/glm/include -I src/libs/stb_image
+INCLUDES += -I src/libs/lua/src 
 # General linker settings
-ifeq ($(UNAME_S),Darwin)
-	LINK_FLAGS = -framework OpenGL #-framework CoreVideo -framework IOKit -framework Cocoa -framework Carbon
-else
-	LINK_FLAGS = 
-endif
+#ifeq ($(UNAME_S),Darwin)
+#	LINK_FLAGS = -framework OpenGL
+#else
+LINK_FLAGS = 
+#endif
 #### END PROJECT SETTINGS ####
 
 # Optionally you may move the section above to a separate config.mk file, and
