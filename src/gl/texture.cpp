@@ -1,39 +1,98 @@
 #include "texture.hpp"
 
-namespace gl {
+namespace
+{
 
-void Texture::init(const std::string &filepath, GLint typeOfImage,
-                   int stbi_load_as) {
-  // Generate the texture's ID
-  glGenTextures(1, &ID);
-  glBindTexture(GL_TEXTURE_2D, ID);
-
-  // Generic settings for the textures
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-  // Load and generate the texture
-  int nrChannels;
-
-  stbi_set_flip_vertically_on_load(false);
-
-  unsigned char *data =
-      stbi_load(filepath.c_str(), &width, &height, &nrChannels, stbi_load_as);
-
-  if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, typeOfImage, width, height, 0, typeOfImage,
-                 GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  } else
-    std::cout << "Failed to load texture, your surroundings will be black."
-              << '\n';
-
-  // Free the data
-  stbi_image_free(data);
+void setTextureParameters(GLenum target = GL_TEXTURE_2D)
+{
+    glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
-void Texture::bind() { glBindTexture(GL_TEXTURE_2D, ID); }
+} // namespace
+
+
+namespace gl
+{
+
+Texture::Texture(const std::string &filepath)
+{
+    init(filepath);
+}
+
+Texture::Texture(sf::Image &img)
+{
+    init(img);
+}
+
+Texture::~Texture()
+{
+    destroy();
+}
+
+void Texture::init()
+{
+    glGenTextures(1, &ID);
+}
+
+void Texture::init(const std::string &filepath)
+{
+    sf::Image img;
+    if (!img.loadFromFile(filepath))
+    {
+        img.create(256, 256, nullptr);
+        for (unsigned int x = 0; x < 256; x++)
+        for (unsigned int y = 0; y < 256; y++)
+        {
+            img.setPixel(x, y, sf::Color::Black);
+        }
+    }
+
+    init(img);
+}
+
+void Texture::init(sf::Image &img)
+{
+    init();
+    changeTexture(img);
+}
+
+void Texture::destroy()
+{
+    glDeleteTextures(1, &ID);
+}
+
+void Texture::changeTexture(const std::string &filepath)
+{
+    sf::Image img;
+    if (!img.loadFromFile(filepath))
+    {
+        img.create(256, 256, nullptr);
+        for (unsigned int x = 0; x < 256; x++)
+        for (unsigned int y = 0; y < 256; y++)
+        {
+            img.setPixel(x, y, sf::Color::Black);
+        }
+    }
+
+    changeTexture(img);
+}
+
+void Texture::changeTexture(sf::Image &img)
+{
+    bind();
+    setTextureParameters();
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.getSize().x, img.getSize().y, 0, GL_RGBA,
+    GL_UNSIGNED_BYTE, img.getPixelsPtr());
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void Texture::bind() const
+{ 
+    glBindTexture(GL_TEXTURE_2D, ID); 
+}
 
 } // namespace gl

@@ -3,10 +3,12 @@
 
 #include <glad/glad.h>
 
+#include <stddef.h>
 #include <vector>
 
 namespace gl {
 
+// WARNING: Leagcy wrapper. Use the newer VertexArray wrapper.
 struct Buffer {
   unsigned int ID;
 

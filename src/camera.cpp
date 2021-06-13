@@ -11,7 +11,7 @@ Camera::Camera()
     updateVectors();
 
     float aspect = (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT;
-    projectionMatrix = glm::perspective(3.14f / 4.0f, aspect, 0.01f, 1000.0f);
+    projectionMatrix = glm::perspective(3.14f / 4.0f, aspect, 0.1f, 1000.0f);
 }
 
 Camera::~Camera()
@@ -32,7 +32,6 @@ void Camera::update()
 void Camera::hookEntity(Entity &entity)
 {
     ptEntity = &entity;
-    ptEntity->ptCamera = this;
     update();
 }
 
@@ -40,7 +39,6 @@ void Camera::unhookEntity()
 {
     if (ptEntity)
     {
-        ptEntity->ptCamera = nullptr;
         ptEntity = nullptr;
     }
 }

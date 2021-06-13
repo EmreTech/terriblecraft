@@ -10,8 +10,7 @@ void main()
 {
     FragColor = Light * texture(texture1, TexCoord);
 
-    if (FragColor.a == 0)
-    {
+    if (FragColor.a < 0.1f)
         discard;
-    }
+    
 }

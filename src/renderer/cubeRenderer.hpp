@@ -5,8 +5,7 @@
 #include <vector>
 
 #include "../gl/shader.hpp"
-#include "../gl/buffer.hpp"
-#include "../gl/vao.hpp"
+#include "../gl/vertex_array.hpp"
 #include "../gl/texture.hpp"
 
 struct Camera;
@@ -17,7 +16,6 @@ namespace Renderer
 struct CubeRenderer
 {
     CubeRenderer();
-    ~CubeRenderer();
 
     void add(const glm::vec3 &position);
     void render(const Camera &cam);
@@ -26,10 +24,7 @@ struct CubeRenderer
     std::vector<glm::vec3> cubePos;
 
     gl::Shader shader;
-
-    gl::Buffer vbo, ebo;
-    gl::VAO vao;
-
+    gl::VertexArray nVAO;
     gl::Texture texture;
 };
 

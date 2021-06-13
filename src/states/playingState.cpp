@@ -1,5 +1,7 @@
 #include "playingState.hpp"
 
+#include "../world/world_constants.hpp"
+#include "../world/coordinate.hpp"
 #include "../camera.hpp"
 
 namespace States
@@ -16,7 +18,25 @@ void PlayingState::handleInput()
 }
 
 void PlayingState::handleEvents(sf::Event event)
-{}
+{
+    switch (event.type)
+    {
+        case sf::Event::KeyPressed:
+        switch (event.key.code)
+        {
+            case sf::Keyboard::V:
+            wireframe = !wireframe;
+            break;
+
+            default:
+            break;
+        }
+        break;
+
+        default:
+        break;
+    }
+}
 
 void PlayingState::update(float deltaTime)
 {
@@ -25,6 +45,8 @@ void PlayingState::update(float deltaTime)
 
 void PlayingState::render(Renderer::RenderMaster &renderer)
 {
+    glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
+    
     renderer.drawCube({0.0f, 0.0f, 3.0f});
 }
 

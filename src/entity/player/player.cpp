@@ -10,6 +10,7 @@ namespace Player
 Player::Player(const glm::vec3 &startPos)
 {
     position   = startPos;
+    rotation.x = 45.0f;
     velocity   = {0.0f, 0.0f, 0.0f};
 
     input.linkEntity(*this);
@@ -35,7 +36,7 @@ void Player::keyboard()
     float currentSpeed = speed;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-        currentSpeed *= 20.0f;
+        currentSpeed *= 5.0f;
 
     PlayerMovement movement;
 
@@ -51,17 +52,29 @@ void Player::keyboard()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         movement = PlayerMovement::RIGHT;
 
-    input.keyboardInput(movement, currentSpeed);
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        velocity.y += currentSpeed;
+        velocity.y += speed * 2.0f;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-        velocity.y -= currentSpeed;
+        velocity.y -= speed * 2.0f;
+
+    velocity += input.keyboardInput(movement) * currentSpeed;
 }
 
 void Player::mouse(const sf::Window &window)
 {
+    if (mouseMovements == 0)
+    {
+        // Fixes camera jittering on macOS (solution from open-builder)
+#ifndef __APPLE__
+        lastMousePosition = sf::Mouse::getPosition(window);
+#else
+        lastMousePosition.x = (int) window.getSize().x / 2;
+        lastMousePosition.y = (int) window.getSize().y / 2;
+#endif
+        mouseMovements++;
+    }
+
     auto mouseChange = sf::Mouse::getPosition(window) - lastMousePosition;
 
     input.mouseInput(mouseChange, sensitivity);
@@ -77,6 +90,10 @@ void Player::mouse(const sf::Window &window)
     lastMousePosition.x = (int) window.getSize().x / 2;
     lastMousePosition.y = (int) window.getSize().y / 2;
 #endif
+
+    if ((mouseChange.x < 0 || mouseChange.x > 0) ||
+        (mouseChange.y < 0 || mouseChange.y > 0))
+        mouseMovements++;
 }
 
 } // namespace Player

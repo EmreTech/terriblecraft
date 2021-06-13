@@ -17,7 +17,7 @@ void RenderMaster::drawCube(const glm::vec3 &pos)
 
 void RenderMaster::finishRender(const Camera &cam)
 {
-    quadRenderer.render(cam);
+    //quadRenderer.render(cam);
     cubeRenderer.render(cam);
 }
 

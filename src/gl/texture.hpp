@@ -2,26 +2,35 @@
 #define TEXTURE_HPP
 
 #include <glad/glad.h>
-#include <stb_image.h>
+#include <SFML/Graphics/Image.hpp>
 
 #include <iostream>
 #include <string>
 
-namespace gl {
+namespace gl 
+{
 
-struct Texture {
-  unsigned int ID;
-  int width, height;
+// TODO: Redo the texture wrapper (I can do a lot better with sf::Image)
 
-  Texture() {}
+struct Texture 
+{
+    unsigned int ID;
 
-  Texture(const std::string &filepath, GLint typeOfImage,
-          int stbi_load_as = STBI_rgb) {
-    init(filepath, typeOfImage, stbi_load_as);
-  }
+    Texture() = default;
+    Texture(const std::string &filepath);
+    Texture(sf::Image &img);
 
-  void init(const std::string &filepath, GLint typeOfImage, int stbi_load_as);
-  void bind();
+    ~Texture();
+
+    void init();
+    void init(const std::string &filepath);
+    void init(sf::Image &img);
+    void destroy();
+
+    void changeTexture(const std::string &filepath);
+    void changeTexture(sf::Image &img);
+
+    void bind() const;
 };
 
 } // namespace gl

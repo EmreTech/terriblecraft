@@ -26,10 +26,12 @@ void PlayerInput::unlinkEntity()
     }
 }
 
-void PlayerInput::keyboardInput(PlayerMovement movement, float speed)
+const glm::vec3 PlayerInput::keyboardInput(PlayerMovement movement)
 {
     if (!ptEntity)
-        return;
+    {
+        return {0.0f, 0.0f, 0.0f};
+    }
 
     float yaw = ptEntity->rotation.y;
     glm::vec3 acceleration{0.0f};
@@ -47,8 +49,8 @@ void PlayerInput::keyboardInput(PlayerMovement movement, float speed)
         break;
 
         case PlayerMovement::LEFT:
-        acceleration.x += -glm::cos(glm::radians(yaw + 90));
-        acceleration.z += -glm::sin(glm::radians(yaw + 90));
+        acceleration.x -= glm::cos(glm::radians(yaw + 90));
+        acceleration.z -= glm::sin(glm::radians(yaw + 90));
         break;
 
         case PlayerMovement::RIGHT:
@@ -57,8 +59,7 @@ void PlayerInput::keyboardInput(PlayerMovement movement, float speed)
         break;
     }
 
-    acceleration * speed;
-    ptEntity->velocity += acceleration;
+    return acceleration;
 }
 
 void PlayerInput::mouseInput(sf::Vector2i change, float sensitivity)

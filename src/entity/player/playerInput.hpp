@@ -26,7 +26,7 @@ struct PlayerInput
     void linkEntity(Entity &entity);
     void unlinkEntity();
 
-    void keyboardInput(PlayerMovement movement, float speed);
+    const glm::vec3 keyboardInput(PlayerMovement movement);
     void mouseInput(sf::Vector2i change, float sensitivity);
 
     private:

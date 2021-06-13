@@ -1,7 +1,7 @@
 #ifndef STATE_BASE_HPP
 #define STATE_BASE_HPP
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Window/Event.hpp>
 
 #include "../camera.hpp"
 

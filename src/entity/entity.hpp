@@ -3,16 +3,12 @@
 
 #include "../utils/glm_include.hpp"
 
-struct Camera;
-
 struct Entity
 {
     glm::vec3 position;
     glm::vec3 rotation;
 
     glm::vec3 velocity;
-
-    Camera *ptCamera = nullptr;
 };
 
 #endif

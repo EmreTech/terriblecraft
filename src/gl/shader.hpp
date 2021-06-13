@@ -33,6 +33,11 @@ struct Shader {
                        glm::value_ptr(value));
   }
 
+  void uniformVector3(const std::string &name, const glm::vec3 &value)
+  {
+    glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value));
+  }
+
 private:
   void shaderSuccessfullyCompiled(unsigned int ID, std::string_view type);
 };

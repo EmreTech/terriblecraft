@@ -7,6 +7,7 @@
 
 namespace gl {
 
+// WARNING: Leagcy wrapper. Use the newer VertexArray wrapper.
 struct VAO {
   unsigned int ID;
 

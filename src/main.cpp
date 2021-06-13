@@ -8,9 +8,9 @@
 #include "renderer/renderMaster.hpp"
 
 // Colors
-float r = 12.0f;
-float g = 155.0f;
-float b = 175.0f;
+float r = 63.75f;
+float g = 191.25f;
+float b = 255.0f;
 
 std::vector<std::unique_ptr<States::BaseState>> states;
 Camera cam;
@@ -18,7 +18,7 @@ Camera cam;
 // Timing
 float deltaTime = 0.0f, lastFrame = 0.0f;
 
-void handleEvents(bool &running)
+void handleEvents(bool &running, States::BaseState &currentState)
 {
     sf::Event event;
     while (Window::get().pollEvent(event))
@@ -48,6 +48,7 @@ void handleEvents(bool &running)
             default:
             break;
         }
+        currentState.handleEvents(event);
     }
 }
 
@@ -91,7 +92,7 @@ int main()
         update(currentState);
         render(currentState, master);
 
-        handleEvents(running);
+        handleEvents(running, currentState);
     }
 
     return EXIT_SUCCESS;

@@ -1,5 +1,8 @@
 #include "cubeRenderer.hpp"
 
+#include <algorithm>
+#include <iterator>
+
 #include "../camera.hpp"
 #include "../utils/constants.hpp"
 
@@ -10,45 +13,100 @@ CubeRenderer::CubeRenderer()
 {
     shader.init("shaders/basicVertex.glsl", "shaders/basicFragment.glsl");
 
-    float vertices[] = {
-        // Back
-        0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.8f,
-        1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.8f, 
-        1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.8f, 
-        0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.8f,
+    std::vector<float> vertices {
+        0.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f, 
+        1.0f, 0.0f, 0.0f, 
+        0.0f, 0.0f, 0.0f,
 
-        // Right
-        1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.6f,
-        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.6f,
-        1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.6f,
-        1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.6f,
+        1.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 0.0f,
 
-        // Front
-        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.8f,
-        0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.8f,
-        0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.8f,
-        1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.8f, 
+        1.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f,
 
-        // Left
-        0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.6f,
-        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.6f,
-        0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.6f,
-        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.6f,
+        0.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
 
-        // Top
-        1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
 
-        // Bottom
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.4f,
-        1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.4f,
-        1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.4f,
-        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.4f,
+        0.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
     };
 
-    unsigned int indices[] = {
+    /*
+
+    0, 0 is bottom left
+    1, 0 is bottom right
+    1, 1 is top right
+    0, 1 is top left
+
+    */
+
+    glm::vec2 bottomLeft (0.0f, 0.0f);
+    glm::vec2 bottomRight(1.0f, 0.0f);
+    glm::vec2 topRight(1.0f, 1.0f);
+    glm::vec2 topLeft(0.0f, 1.0f);
+
+    std::vector<float> texCoords;
+
+    for (int i = 0; i < 6; i++)
+    {
+        texCoords.push_back(-bottomLeft.x);
+        texCoords.push_back(bottomLeft.y);
+        texCoords.push_back(-bottomRight.x);
+        texCoords.push_back(bottomRight.y);
+
+        texCoords.push_back(-topRight.x);
+        texCoords.push_back(topRight.y);
+        texCoords.push_back(-topLeft.x);
+        texCoords.push_back(topLeft.y);
+    }
+
+    std::vector<float> lightLevs {
+        0.8f,
+        0.8f,
+        0.8f,
+        0.8f,
+
+        0.6f,
+        0.6f,
+        0.6f,
+        0.6f,
+
+        0.8f,
+        0.8f,
+        0.8f,
+        0.8f,
+
+        0.6f,
+        0.6f,
+        0.6f,
+        0.6f,
+
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+
+        0.4f,
+        0.4f,
+        0.4f,
+        0.4f,
+    };
+
+    std::vector<GLuint> indices {
         0, 1, 2,
         2, 3, 0,
 
@@ -68,36 +126,12 @@ CubeRenderer::CubeRenderer()
         22, 23, 20
     };
 
-    vao.init();
-    vbo.init(GL_ARRAY_BUFFER);
-    ebo.init(GL_ELEMENT_ARRAY_BUFFER);
+    nVAO.addVBO(3, vertices);
+    nVAO.addVBO(2, texCoords);
+    nVAO.addVBO(1, lightLevs);
+    nVAO.addEBO(indices);
 
-    vao.bind();
-    vbo.bind(GL_ARRAY_BUFFER);
-    vbo.bufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices);
-
-    ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
-    ebo.bufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices);
-
-    vao.attribute(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), 0);
-    glEnableVertexAttribArray(0);
-
-    vao.attribute(vbo, 1, 2, GL_FLOAT, 6 * sizeof(float), 3 * sizeof(float));
-    glEnableVertexAttribArray(1);
-
-    vao.attribute(vbo, 2, 1, GL_FLOAT, 6 * sizeof(float), 5 * sizeof(float));
-    glEnableVertexAttribArray(2);
-
-    texture.init("res/images/blocks/grass_side.png", GL_RGBA, STBI_rgb_alpha);
-
-    std::cout << glGetError() << '\n';
-}
-
-CubeRenderer::~CubeRenderer()
-{
-    vbo.destroy();
-    ebo.destroy();
-    vao.destroy();
+    texture.init("res/images/blocks.png");
 }
 
 void CubeRenderer::add(const glm::vec3 &position)
@@ -109,21 +143,17 @@ void CubeRenderer::render(const Camera &cam)
 {
     glEnable(GL_DEPTH_TEST);
     texture.bind();
-
     shader.activate();
 
-    auto projection = cam.ProjMatrix();
-    auto view = cam.ViewMatrix();
-    shader.uniformMatrix4("projView", (projection * view));
+    shader.uniformMatrix4("projView", (cam.ProjMatrix() * cam.ViewMatrix()));
 
-    vao.bind();
     for (auto &position : cubePos)
     {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, position);
         shader.uniformMatrix4("model", model);
 
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+        nVAO.getDrawable().bindDraw();
     }
 
     glDisable(GL_DEPTH_TEST);

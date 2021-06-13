@@ -30,6 +30,7 @@ struct Player : public Entity
     PlayerInput input;
 
     sf::Vector2i lastMousePosition;
+    int mouseMovements = 0;
 };
 
 } // namespace Player
