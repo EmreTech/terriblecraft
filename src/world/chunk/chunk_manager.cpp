@@ -60,4 +60,28 @@ bool ChunkManager::hasChunk(const Position &chunk) const
     return chunks.find(chunk) != chunks.cend();
 }
 
+bool ChunkManager::hasNeighbours(const Position &chunk) const
+{
+    const auto &p = chunk;
+    return hasChunk(p) &&
+           hasChunk({p.x, p.y + 1, p.z}) &&
+           hasChunk({p.x, p.y - 1, p.z}) &&
+           hasChunk({p.x - 1, p.y, p.z}) &&
+           hasChunk({p.x + 1, p.y, p.z}) && 
+           hasChunk({p.x, p.y, p.z - 1}) &&
+           hasChunk({p.x, p.y, p.z + 1});
+}
+
+void ChunkManager::ensureNeighbours(const Position &chunkPos)
+{
+    const auto &p = chunkPos;
+    addChunk(p);
+    addChunk({p.x, p.y + 1, p.z});
+    addChunk({p.x, p.y - 1, p.z});
+    addChunk({p.x - 1, p.y, p.z});
+    addChunk({p.x + 1, p.y, p.z});
+    addChunk({p.x, p.y, p.z - 1});
+    addChunk({p.x, p.y, p.z + 1});
+}
+
 } // namespace World

@@ -1,5 +1,7 @@
 #include "chunk_mesh_builder.hpp"
 
+#include <SFML/System/Clock.hpp>
+
 #include <iostream>
 
 #include "chunk.hpp"
@@ -42,6 +44,9 @@ namespace World
 
 ChunkMesh buildChunkMesh(const Chunk &chunk)
 {
+    sf::Clock clock;
+    static float totalTime = 0.0f;
+
     auto &blockData = BlockDataManager::get();
     ChunkMesh mesh(chunk.getPosition());
 
@@ -87,6 +92,10 @@ ChunkMesh buildChunkMesh(const Chunk &chunk)
                 mesh.addFace(TOP_FACE, blockPos, topTexCoords);
         }
     }
+
+    totalTime = clock.getElapsedTime().asMilliseconds() / 1000.0f;
+    std::cout << "Chunk Mesh building finished: \n" <<
+    "Time elapsed: " << totalTime << " seconds" << '\n';
 
     return mesh;
 }

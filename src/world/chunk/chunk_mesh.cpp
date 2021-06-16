@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "../world_constants.hpp"
+#include "../coordinate.hpp"
 
 namespace
 {
@@ -10,7 +11,7 @@ namespace
 template <typename T>
 size_t vectorSize(const std::vector<T> vec)
 {
-    return vec.size() * sizeof(vec[0]);
+    return vec.size() * sizeof(T);
 }
 
 } // namespace
@@ -28,9 +29,11 @@ void ChunkMesh::addFace(const MeshFace &face, const Position &blockPos, const Te
     int index = 0;
     for (unsigned int i = 0; i < 4; i++)
     {
-        vertices.push_back(face.vertices[index++] + position.x * CHUNK_SIZE   + blockPos.x);
-        vertices.push_back(face.vertices[index++] + position.y * CHUNK_HEIGHT + blockPos.y);
-        vertices.push_back(face.vertices[index++] + position.z * CHUNK_SIZE   + blockPos.z);
+        auto globalPos = toGlobalBlockPosition(blockPos, position);
+
+        vertices.push_back(face.vertices[index++] + globalPos.x);
+        vertices.push_back(face.vertices[index++] + globalPos.y);
+        vertices.push_back(face.vertices[index++] + globalPos.z);
 
         lightLevels.push_back(face.lightLevel);
     }
@@ -54,19 +57,13 @@ gl::VertexArray ChunkMesh::buffer()
     
     vao.addEBO(indices);
 
-    vertices.clear();
-    TextureCoords.clear();
-    lightLevels.clear();
-    indices.clear();
-
-    vertices.shrink_to_fit();
-    TextureCoords.shrink_to_fit();
-    lightLevels.shrink_to_fit();
-    indices.shrink_to_fit();
-
-    indicesCount = 0;
-
     return vao;
+}
+
+size_t ChunkMesh::calculateBufferSize()
+{
+    return vectorSize(vertices) + vectorSize(TextureCoords) + 
+    vectorSize(lightLevels) + vectorSize(indices);
 }
 
 } // namespace World

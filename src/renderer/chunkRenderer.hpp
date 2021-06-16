@@ -19,6 +19,8 @@ namespace World
 namespace Renderer
 {
 
+// BUG: Chunk rendering takes a HUGE amount of memory quickly
+
 struct ChunkRenderer
 {
     ChunkRenderer();

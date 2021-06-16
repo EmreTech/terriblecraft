@@ -26,7 +26,7 @@ namespace World
 {
 
 Chunk::Chunk(const glm::vec3 &position, ChunkManager &manager)
-: Position(position), mesh(position), ptManager(&manager)
+: Position(position), ptManager(&manager)
 {
     blocks.fill(BlockDataManager::get().getId(CommonBlock::Air));
 }
@@ -69,11 +69,6 @@ void Chunk::setBlock(const glm::vec3 &pos, block_t block)
 const glm::vec3& Chunk::getPosition() const
 {
     return Position;
-}
-
-ChunkMesh& Chunk::getMesh()
-{
-    return mesh;
 }
 
 } // namespace World

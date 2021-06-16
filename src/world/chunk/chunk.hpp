@@ -60,13 +60,11 @@ struct Chunk
     void setBlock(const glm::vec3 &pos, block_t block);
 
     const glm::vec3& getPosition() const;
-    ChunkMesh& getMesh();
 
     BlockArray blocks;
 
     private:
     glm::vec3 Position;
-    ChunkMesh mesh;
     ChunkManager *ptManager;
 };
 

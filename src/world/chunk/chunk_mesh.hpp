@@ -25,8 +25,10 @@ struct ChunkMesh
     void addFace(const MeshFace &face, const Position &blockPos, const TextureData &textureCoords);
 
     gl::VertexArray buffer();
+    size_t calculateBufferSize();
 
-    Position position;
+    Position position; 
+    int indicesCount = 0;
 
     private:
     void bufferToVAO();
@@ -35,8 +37,6 @@ struct ChunkMesh
     std::vector<float> TextureCoords;
     std::vector<GLuint> lightLevels;
     std::vector<GLuint> indices;
-
-    int indicesCount = 0;
 };
 
 } // namespace World
