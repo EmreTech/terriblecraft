@@ -12,8 +12,8 @@ namespace World
 struct ChunkManager final
 {
     Chunk &addChunk(const Position &chunk);
-
-    const Chunk &getChunk(const Position &chunk);
+    void removeChunk(const Position &chunk);
+    Chunk &getChunk(const Position &chunk);
 
     block_t getBlock(const Position &pos) const;
     void setBlock(const Position &pos, block_t block);

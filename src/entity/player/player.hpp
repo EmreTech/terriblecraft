@@ -6,7 +6,6 @@
 #include "../entity.hpp"
 #include "../../utils/constants.hpp"
 #include "../../camera.hpp"
-#include "playerInput.hpp"
 
 namespace Player
 {
@@ -26,8 +25,6 @@ struct Player : public Entity
 
     void keyboard();
     void mouse(const sf::Window &window);
-
-    PlayerInput input;
 
     sf::Vector2i lastMousePosition;
     int mouseMovements = 0;

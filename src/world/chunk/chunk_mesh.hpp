@@ -25,15 +25,16 @@ struct ChunkMesh
     void addFace(const MeshFace &face, const Position &blockPos, const TextureData &textureCoords);
 
     gl::VertexArray buffer();
-    size_t calculateBufferSize() const;
 
     Position position;
+
+    private:
+    void bufferToVAO();
 
     std::vector<float> vertices;
     std::vector<float> TextureCoords;
     std::vector<GLuint> lightLevels;
-
-    std::vector<unsigned int> indices;
+    std::vector<GLuint> indices;
 
     int indicesCount = 0;
 };

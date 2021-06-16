@@ -6,10 +6,9 @@
 namespace World
 {
 
-struct BlockDataManager;
 struct Chunk;
 
-ChunkMesh buildChunkMesh(const Chunk &chunk, const BlockDataManager &blockData);
+ChunkMesh buildChunkMesh(const Chunk &chunk);
 
 } // namespace World
 

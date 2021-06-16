@@ -9,9 +9,6 @@ Camera::Camera()
     Front = glm::vec3(0.0f, 0.0f, -1.0f);
     WorldUp = Up;
     updateVectors();
-
-    float aspect = (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT;
-    projectionMatrix = glm::perspective(3.14f / 4.0f, aspect, 0.1f, 1000.0f);
 }
 
 Camera::~Camera()
@@ -21,10 +18,14 @@ Camera::~Camera()
 
 void Camera::update()
 {
+    // This is updated first since this isn't generated in the constructor
+    projectionMatrix = createProjectionMatrix(*this);
+
     // Update the camera's position and rotation to be linked to the entity's one
     position = ptEntity->position;
     rotation = ptEntity->rotation;
 
+    // Re-generate the vectors/view matrix after updating the camera's position/rotation
     updateVectors();
     viewMatrix = createViewMatrix(*this);
 }

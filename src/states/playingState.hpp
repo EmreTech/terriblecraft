@@ -5,6 +5,7 @@
 #include "../utils/glm_include.hpp"
 #include "../renderer/renderMaster.hpp"
 #include "../entity/player/player.hpp"
+#include "../world/chunk/chunk_manager.hpp"
 #include "../window.hpp"
 
 namespace States
@@ -21,10 +22,13 @@ struct PlayingState : public BaseState
     void render(Renderer::RenderMaster &renderer) override;
 
     private:
-    Player::Player player{ {0.0f, 2.0f, 0.0f} };
+    Player::Player player{ { CHUNK_SIZE / 2, CHUNK_HEIGHT * 2 + 1, CHUNK_SIZE / 2 } };
     Camera *ptCamera = nullptr;
 
     bool wireframe = false;
+
+    // Temporarily here for now
+    World::ChunkManager test;
 };
 
 } // namespace States

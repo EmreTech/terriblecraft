@@ -6,6 +6,31 @@
 #include "../camera.hpp"
 #include "../utils/constants.hpp"
 
+namespace
+{
+
+std::vector<float> GetTextureCoords(int column, int row) 
+{
+    const float maxColumn = 16.0f;
+    const float maxRow = 16.0f;
+
+    float leftX = column / maxColumn;            
+    float rightX = (column + 1.0f) / maxColumn;    
+    float topY = (row + 1.0f) / maxRow;          
+    float bottomY = row / maxRow;
+
+    return
+    {
+        leftX, bottomY,
+        rightX, bottomY,
+        rightX, topY,
+        leftX, topY,
+    };
+}
+
+} // namespace
+
+
 namespace Renderer
 {
 
@@ -54,24 +79,12 @@ CubeRenderer::CubeRenderer()
 
     */
 
-    glm::vec2 bottomLeft (0.0f, 0.0f);
-    glm::vec2 bottomRight(1.0f, 0.0f);
-    glm::vec2 topRight(1.0f, 1.0f);
-    glm::vec2 topLeft(0.0f, 1.0f);
-
     std::vector<float> texCoords;
+    auto generatedTexCoords = GetTextureCoords(3, 0);
 
     for (int i = 0; i < 6; i++)
     {
-        texCoords.push_back(-bottomLeft.x);
-        texCoords.push_back(bottomLeft.y);
-        texCoords.push_back(-bottomRight.x);
-        texCoords.push_back(bottomRight.y);
-
-        texCoords.push_back(-topRight.x);
-        texCoords.push_back(topRight.y);
-        texCoords.push_back(-topLeft.x);
-        texCoords.push_back(topLeft.y);
+        texCoords.insert(texCoords.end(), generatedTexCoords.begin(), generatedTexCoords.end());
     }
 
     std::vector<float> lightLevs {
@@ -142,9 +155,10 @@ void CubeRenderer::add(const glm::vec3 &position)
 void CubeRenderer::render(const Camera &cam)
 {
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
     texture.bind();
     shader.activate();
-
     shader.uniformMatrix4("projView", (cam.ProjMatrix() * cam.ViewMatrix()));
 
     for (auto &position : cubePos)
@@ -156,6 +170,7 @@ void CubeRenderer::render(const Camera &cam)
         nVAO.getDrawable().bindDraw();
     }
 
+    glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     cubePos.clear();
 }

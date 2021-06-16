@@ -1,10 +1,17 @@
 #include "maths.hpp"
 
 #include "../camera.hpp"
+#include "constants.hpp"
 
 glm::mat4 createViewMatrix(Camera &camera)
 {
     return glm::lookAt(camera.position, camera.position + camera.Front, camera.Up);
+}
+
+glm::mat4 createProjectionMatrix(Camera &camera)
+{
+    float aspect = (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT;
+    return glm::perspective(glm::radians(camera.fov), aspect, 0.1f, 1000.0f);
 }
 
 void rotateMatrix(glm::mat4 &matrix, const glm::vec3 &degrees)

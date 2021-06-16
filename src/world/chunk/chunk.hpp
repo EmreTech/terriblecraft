@@ -13,13 +13,15 @@ namespace World
 
 using BlockArray = std::array<block_t, CHUNK_VOLUME>;
 
+struct ChunkManager;
+
 struct Chunk
 {
-    Chunk(const glm::vec3 &position);
+    Chunk(const glm::vec3 &position, ChunkManager &manager);
     
     /**
-     * @brief Quickly gets a block - meaning no bounds checking
-     * is done. This is unsafe.
+     * @brief Quickly gets a block - meaning if the block is out-of-bounds, 
+     * we don't get the block from an adjacent chunk.
      * 
      * @param pos The position to get the block from
      * @return block_t The block's id at that position
@@ -27,8 +29,8 @@ struct Chunk
     block_t quickGetBlock(const glm::vec3 &pos) const;
 
     /**
-     * @brief Quickly sets a block - meaning no bounds checking
-     * is done. This is unsafe.
+     * @brief Quickly sets a block - meaning if the block is out-of-bounds, 
+     * we don't set the block onto an adjacent chunk.
      * 
      * @param pos The position to set the block at
      * @param block The block to set
@@ -58,12 +60,14 @@ struct Chunk
     void setBlock(const glm::vec3 &pos, block_t block);
 
     const glm::vec3& getPosition() const;
+    ChunkMesh& getMesh();
 
-    BlockArray blocks{0};
-    ChunkMesh mesh;
+    BlockArray blocks;
 
     private:
     glm::vec3 Position;
+    ChunkMesh mesh;
+    ChunkManager *ptManager;
 };
 
 } // namespace World

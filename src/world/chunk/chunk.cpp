@@ -1,5 +1,8 @@
 #include "chunk.hpp"
 
+#include "chunk_manager.hpp"
+#include "../block/block_data.hpp"
+
 namespace
 {
     
@@ -22,30 +25,32 @@ int toLocalIndex(const glm::vec3 &pos)
 namespace World
 {
 
-Chunk::Chunk(const glm::vec3 &position)
-: Position(position), mesh(position)
-{}
+Chunk::Chunk(const glm::vec3 &position, ChunkManager &manager)
+: Position(position), mesh(position), ptManager(&manager)
+{
+    blocks.fill(BlockDataManager::get().getId(CommonBlock::Air));
+}
 
 block_t Chunk::quickGetBlock(const glm::vec3 &pos) const
 {
-    assert(!blockPosOutOfChunkBounds(pos));
+    if (blockPosOutOfChunkBounds(pos))
+        return BlockDataManager::get().getId(CommonBlock::Air);
+    
     return blocks[toLocalIndex(pos)];
 }
 
 void Chunk::quickSetBlock(const glm::vec3 &pos, block_t block)
 {
-    assert(!blockPosOutOfChunkBounds(pos));
+    if (blockPosOutOfChunkBounds(pos))
+        return;
+
     blocks[toLocalIndex(pos)] = block;
 }
 
 block_t Chunk::getBlock(const glm::vec3 &pos) const
 {
     if (blockPosOutOfChunkBounds(pos))
-    {
-        //TODO: When a world or chunk manager is implemented, use that to
-        // get a block at the out-of-bounds position.
-        return 0;
-    }
+        return ptManager->getBlock(pos);
 
     return quickGetBlock(pos);
 }
@@ -54,8 +59,7 @@ void Chunk::setBlock(const glm::vec3 &pos, block_t block)
 {
     if (blockPosOutOfChunkBounds(pos))
     {
-        // TODO: When a world or chunk manager is implemented, use that to
-        // set a block at the out-of-bounds position.
+        ptManager->setBlock(pos, block);
         return;
     }
 
@@ -65,6 +69,11 @@ void Chunk::setBlock(const glm::vec3 &pos, block_t block)
 const glm::vec3& Chunk::getPosition() const
 {
     return Position;
+}
+
+ChunkMesh& Chunk::getMesh()
+{
+    return mesh;
 }
 
 } // namespace World

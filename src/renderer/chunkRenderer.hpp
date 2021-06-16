@@ -2,9 +2,10 @@
 #define CHUNK_RENDERER_HPP
 
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 #include "../gl/shader.hpp"
+#include "../gl/texture.hpp"
 #include "../gl/vertex_array.hpp"
 #include "../world/coordinate.hpp"
 
@@ -20,15 +21,16 @@ namespace Renderer
 
 struct ChunkRenderer
 {
-    ChunkRenderer() = default;
+    ChunkRenderer();
 
     void add(World::ChunkMesh &mesh);
     void render(const Camera &cam);
 
     private:
-    std::unordered_map<glm::vec3, gl::VertexArray, PositionHash> chunkMeshes;
+    std::vector<gl::VertexArray> chunkMeshes;
 
-    gl::Shader shader{"shaders/chunkVertex.glsl", "shaders/basicFragment.glsl"};
+    gl::Shader shader;
+    gl::Texture textureAtlas;
 };
 
 } // namespace Renderer

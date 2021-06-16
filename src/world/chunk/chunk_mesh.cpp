@@ -1,5 +1,7 @@
 #include "chunk_mesh.hpp"
 
+#include <iostream>
+
 #include "../world_constants.hpp"
 
 namespace
@@ -51,12 +53,20 @@ gl::VertexArray ChunkMesh::buffer()
     vao.addVBO(1, lightLevels);
     
     vao.addEBO(indices);
-    return vao;
-}
 
-size_t ChunkMesh::calculateBufferSize() const
-{
-    //return vectorSize(vertexData) + vectorSize(indices);
+    vertices.clear();
+    TextureCoords.clear();
+    lightLevels.clear();
+    indices.clear();
+
+    vertices.shrink_to_fit();
+    TextureCoords.shrink_to_fit();
+    lightLevels.shrink_to_fit();
+    indices.shrink_to_fit();
+
+    indicesCount = 0;
+
+    return vao;
 }
 
 } // namespace World

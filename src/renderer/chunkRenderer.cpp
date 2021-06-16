@@ -7,25 +7,30 @@
 namespace Renderer
 {
 
+ChunkRenderer::ChunkRenderer()
+{
+    shader.init("shaders/chunkVertex.glsl", "shaders/chunkFragment.glsl");
+    textureAtlas.init("res/images/blocks.png");
+}
+
 void ChunkRenderer::add(World::ChunkMesh &mesh)
 {
-    chunkMeshes.emplace(std::make_pair(mesh.position, mesh.buffer()));
+    chunkMeshes.push_back(mesh.buffer());
 }
 
 void ChunkRenderer::render(const Camera &cam)
 {
-    if (chunkMeshes.empty())
-        return;
-
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+
+    shader.activate();
+    textureAtlas.bind();
+    shader.uniformMatrix4("projView", (cam.ProjMatrix() * cam.ViewMatrix()));
 
     for (auto &e : chunkMeshes)
     {
-        e.second.getDrawable().bindDraw();
+        e.getDrawable().bindDraw();
     }
 
-    glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
     chunkMeshes.clear();

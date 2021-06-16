@@ -12,8 +12,6 @@ Player::Player(const glm::vec3 &startPos)
     position   = startPos;
     rotation.x = 45.0f;
     velocity   = {0.0f, 0.0f, 0.0f};
-
-    input.linkEntity(*this);
 }
 
 void Player::handleInput(const sf::Window &window)
@@ -38,19 +36,32 @@ void Player::keyboard()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
         currentSpeed *= 5.0f;
 
-    PlayerMovement movement;
+    glm::vec3 acceleration{0.0f};
+    float &yaw = rotation.y;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        movement = PlayerMovement::FORWARD;
+    {
+        acceleration.x += glm::cos(glm::radians(yaw));
+        acceleration.z += glm::sin(glm::radians(yaw));
+    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        movement = PlayerMovement::BACKWARD;
+    {
+        acceleration.x -= glm::cos(glm::radians(yaw));
+        acceleration.z -= glm::sin(glm::radians(yaw));
+    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        movement = PlayerMovement::LEFT;
+    {
+        acceleration.x -= glm::cos(glm::radians(yaw + 90));
+        acceleration.z -= glm::sin(glm::radians(yaw + 90));
+    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        movement = PlayerMovement::RIGHT;
+    {
+        acceleration.x += glm::cos(glm::radians(yaw + 90));
+        acceleration.z += glm::sin(glm::radians(yaw + 90));
+    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         velocity.y += speed * 2.0f;
@@ -58,7 +69,7 @@ void Player::keyboard()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
         velocity.y -= speed * 2.0f;
 
-    velocity += input.keyboardInput(movement) * currentSpeed;
+    velocity += acceleration * currentSpeed;
 }
 
 void Player::mouse(const sf::Window &window)
@@ -77,7 +88,23 @@ void Player::mouse(const sf::Window &window)
 
     auto mouseChange = sf::Mouse::getPosition(window) - lastMousePosition;
 
-    input.mouseInput(mouseChange, sensitivity);
+    float &yaw = rotation.y;
+    float &pitch = rotation.x;
+
+    yaw += static_cast<float>(mouseChange.x * sensitivity / 8.0f);
+    pitch -= static_cast<float>(mouseChange.y * sensitivity / 8.0f);
+
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+
+    else if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    if (yaw > 360.0f)
+        yaw = 0.0f;
+
+    else if (yaw < 0)
+        yaw = 360.0f;
 
     auto cx = static_cast<int>(window.getSize().x) / 2;
     auto cy = static_cast<int>(window.getSize().y) / 2;

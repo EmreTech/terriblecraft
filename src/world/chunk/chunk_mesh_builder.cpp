@@ -1,7 +1,10 @@
 #include "chunk_mesh_builder.hpp"
 
+#include <iostream>
+
 #include "chunk.hpp"
 #include "../block/block_data.hpp"
+#include "../../utils/texture_atlas.hpp"
 
 namespace
 {
@@ -15,8 +18,10 @@ const MeshFace RIGHT_FACE  = {{1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0}, 3};
 const MeshFace TOP_FACE    = {{1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1}, 5};
 const MeshFace BOTTOM_FACE = {{0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1}, 2};
 
-bool makeFace(const BlockDataManager &blockData, block_t thisID, block_t compare)
+bool makeFace(block_t thisID, block_t compare)
 {
+    auto &blockData = BlockDataManager::get();
+
     block_t airBlock = blockData.getId(CommonBlock::Air);
     auto &cmpBlock = blockData.getData(compare);
 
@@ -35,9 +40,12 @@ bool makeFace(const BlockDataManager &blockData, block_t thisID, block_t compare
 namespace World
 {
 
-ChunkMesh buildChunkMesh(const Chunk &chunk, const BlockDataManager &blockData)
+ChunkMesh buildChunkMesh(const Chunk &chunk)
 {
+    auto &blockData = BlockDataManager::get();
     ChunkMesh mesh(chunk.getPosition());
+
+    const float ROWS = 16.0f, COLUMNS = 16.0f;
 
     for (int y = 0; y < CHUNK_HEIGHT; y++)
     for (int z = 0; z < CHUNK_SIZE; z++)
@@ -50,29 +58,33 @@ ChunkMesh buildChunkMesh(const Chunk &chunk, const BlockDataManager &blockData)
         {
             auto &blkData = blockData.getData(block);
 
+            World::TextureData topTexCoords    = GetTextureCoords(blkData.topTextureCoords, COLUMNS, ROWS);
+            World::TextureData sideTexCoords   = GetTextureCoords(blkData.sideTextureCoords, COLUMNS, ROWS);
+            World::TextureData bottomTexCoords = GetTextureCoords(blkData.bottomTextureCoords, COLUMNS, ROWS);
+
             // Left
-            if (makeFace(blockData, block, chunk.getBlock({x - 1, y, z})))
-                mesh.addFace(LEFT_FACE, blockPos, {});
+            if (makeFace(block, chunk.getBlock({x - 1, y, z})))
+                mesh.addFace(LEFT_FACE, blockPos, sideTexCoords);
 
             // Right
-            if (makeFace(blockData, block, chunk.getBlock({x + 1, y, z})))
-                mesh.addFace(RIGHT_FACE, blockPos, {});
+            if (makeFace(block, chunk.getBlock({x + 1, y, z})))
+                mesh.addFace(RIGHT_FACE, blockPos, sideTexCoords);
 
             // Front
-            if (makeFace(blockData, block, chunk.getBlock({x, y, z + 1})))
-                mesh.addFace(FRONT_FACE, blockPos, {});
+            if (makeFace(block, chunk.getBlock({x, y, z + 1})))
+                mesh.addFace(FRONT_FACE, blockPos, sideTexCoords);
 
             // Back
-            if (makeFace(blockData, block, chunk.getBlock({x, y, z - 1})))
-                mesh.addFace(BACK_FACE, blockPos, {});
+            if (makeFace(block, chunk.getBlock({x, y, z - 1})))
+                mesh.addFace(BACK_FACE, blockPos, sideTexCoords);
 
             // Bottom
-            if (makeFace(blockData, block, chunk.getBlock({x, y - 1, z})))
-                mesh.addFace(BOTTOM_FACE, blockPos, {});
+            if (makeFace(block, chunk.getBlock({x, y - 1, z})))
+                mesh.addFace(BOTTOM_FACE, blockPos, bottomTexCoords);
 
             // Top
-            if (makeFace(blockData, block, chunk.getBlock({x, y + 1, z})))
-                mesh.addFace(TOP_FACE, blockPos, {});
+            if (makeFace(block, chunk.getBlock({x, y + 1, z})))
+                mesh.addFace(TOP_FACE, blockPos, topTexCoords);
         }
     }
 

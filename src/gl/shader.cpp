@@ -1,5 +1,34 @@
 #include "shader.hpp"
 
+namespace
+{
+
+void shaderSuccessfullyCompiled(unsigned int ID, std::string_view type) {
+  int success;
+  char infoLog[512];
+  glGetShaderiv(ID, GL_COMPILE_STATUS, &success);
+
+  if (!success) {
+    glGetShaderInfoLog(ID, 512, NULL, infoLog);
+    std::cout << "Error while compiling the " << type << " shader: " << infoLog
+              << '\n';
+  }
+}
+
+void shaderSuccessfullyLinked(unsigned int ID) {
+  int success;
+  char infoLog[512];
+  glGetProgramiv(ID, GL_LINK_STATUS, &success);
+
+  if (!success) {
+    glGetProgramInfoLog(ID, 512, NULL, infoLog);
+    std::cout << "Error while linking the shaders: " << infoLog << '\n';
+  }
+}
+
+} // namespace
+
+
 namespace gl {
 
 void Shader::init(const std::string &vertexPath, const std::string &fragPath) {
@@ -48,23 +77,11 @@ void Shader::init(const std::string &vertexPath, const std::string &fragPath) {
   glAttachShader(ID, vertexShader);
   glAttachShader(ID, fragShader);
   glLinkProgram(ID);
+  shaderSuccessfullyLinked(ID);
 
   // Delete unneeded shaders
   glDeleteShader(vertexShader);
   glDeleteShader(fragShader);
-}
-
-void Shader::shaderSuccessfullyCompiled(unsigned int ID,
-                                        std::string_view type) {
-  int success;
-  char infoLog[512];
-  glGetShaderiv(ID, GL_COMPILE_STATUS, &success);
-
-  if (!success) {
-    glGetShaderInfoLog(ID, 512, NULL, infoLog);
-    std::cout << "Error while compiling the " << type << " shader: " << infoLog
-              << '\n';
-  }
 }
 
 } // namespace gl

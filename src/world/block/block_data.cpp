@@ -5,7 +5,35 @@ namespace World
 
 BlockDataManager::BlockDataManager()
 : commonBlockIds(static_cast<size_t>(CommonBlock::Size))
-{}
+{
+    // Just for testing
+
+    BlockData air;
+    air.name = "air";
+    air.topTextureCoords = {0, 0};
+    air.sideTextureCoords = {0, 0};
+    air.bottomTextureCoords = {0, 0};
+    air.style = BlockMeshStyle::None;
+    air.type = BlockType::Gas;
+    air.collidable = false;
+
+    BlockData grass;
+    grass.name = "grass";
+    grass.topTextureCoords = {0, 0};
+    grass.sideTextureCoords = {1, 0};
+    grass.bottomTextureCoords = {2, 0};
+
+    addBlock(air);
+    addBlock(grass);
+
+    initCommonBlockTypes();
+}
+
+BlockDataManager& BlockDataManager::get()
+{
+    static BlockDataManager bdm;
+    return bdm;
+}
 
 void BlockDataManager::initCommonBlockTypes()
 {
@@ -15,9 +43,12 @@ void BlockDataManager::initCommonBlockTypes()
     };
 
     addBlockToCommonBlocks(CommonBlock::Air,   "air");
+
+    /*
     addBlockToCommonBlocks(CommonBlock::Stone, "stone");
     addBlockToCommonBlocks(CommonBlock::Sand,  "sand");
     addBlockToCommonBlocks(CommonBlock::Water, "water");
+    */
 }
 
 block_t BlockDataManager::addBlock(const BlockData &data)
